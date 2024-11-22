@@ -14,6 +14,7 @@ require (
 	github.com/kyverno/policy-reporter-plugins/example v0.0.0-20241121153219-eddcb0ae6453
 	github.com/kyverno/policy-reporter-plugins/sdk/api v0.0.0
 	github.com/swaggo/files v1.0.1
+	github.com/swaggo/files/v2 v2.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.68.0
