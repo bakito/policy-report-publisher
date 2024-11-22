@@ -3,6 +3,7 @@ package kubearmor
 import (
 	"time"
 
+	"github.com/bakito/policy-reporter-plugin/pkg/report"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -45,14 +46,13 @@ type Alert struct {
 	Cwd               string `json:"Cwd"`
 }
 
-func (a Alert) addResult(pol *prv1alpha2.PolicyReport) {
-	policy := a.PolicyName
-	pr := prv1alpha2.PolicyReportResult{
+func (a Alert) toItem() *report.Item {
+	return report.ItemFor(a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
 
 		Severity: a.resultSeverity(),
-		Policy:   policy,
+		Policy:   a.PolicyName,
 		// PolicyResult has one of the following values:
 		//   - pass: indicates that the policy requirements are met
 		//   - fail: indicates that the policy requirements are not met
@@ -74,20 +74,8 @@ func (a Alert) addResult(pol *prv1alpha2.PolicyReport) {
 			"Cwd":               a.Cwd,
 			"UpdatedTime":       a.UpdatedTime.Format(time.RFC3339),
 		},
-	}
+	})
 
-	found := false
-
-	for i, res := range pol.Results {
-		if res.Source == reportSource && res.Policy == policy {
-			pol.Results[i] = pr
-			found = true
-		}
-	}
-
-	if !found {
-		pol.Results = append(pol.Results, pr)
-	}
 }
 
 func (a Alert) resultSeverity() prv1alpha2.PolicySeverity {

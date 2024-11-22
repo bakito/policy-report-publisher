@@ -11,8 +11,6 @@ import (
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"
 	"github.com/kubearmor/kubearmor-client/utils"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const envKubearmorSvc = "KUBEARMOR_SERVICE"
@@ -22,7 +20,7 @@ var (
 	matchLabels       = map[string]string{"kubearmor-app": "kubearmor-relay"}
 )
 
-func Run(ctx context.Context, kc client.Client) {
+func Run(ctx context.Context, reportChan chan *report.Item) {
 
 	eventChan := make(chan klog.EventInfo)
 	o := log.Options{
@@ -36,19 +34,10 @@ func Run(ctx context.Context, kc client.Client) {
 		}
 	}()
 
-	// Consume events from the channel
 	for event := range eventChan {
 		a := &Alert{}
 		_ = json.Unmarshal(event.Data, a)
-
-		err := report.Update(ctx, kc, a.NamespaceName, a.PodName, func(pol *prv1alpha2.PolicyReport) error {
-			a.addResult(pol)
-			pol.Summary.Fail++
-			return nil
-		})
-		if err != nil {
-			panic(err)
-		}
+		reportChan <- a.toItem()
 	}
 }
 

@@ -9,14 +9,22 @@ import (
 )
 
 func main() {
-	err, kc := report.NewKubeClient()
+	handler, err := report.NewHandler()
 	if err != nil {
 		panic(err)
 	}
 
 	ctx := context.TODO()
 
-	kubearmor.Run(ctx, kc)
-	hubble.Run(ctx, kc)
+	reportChan := make(chan *report.Item)
 
+	go kubearmor.Run(ctx, reportChan)
+	go hubble.Run(ctx, reportChan)
+
+	for report := range reportChan {
+		err := handler.Update(ctx, report)
+		if err != nil {
+			panic(err)
+		}
+	}
 }

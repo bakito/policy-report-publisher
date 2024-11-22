@@ -1,7 +1,5 @@
 package hubble
 
-// https://github.com/cilium/cilium/tree/main/hubble/cmd/observe
-
 import (
 	"context"
 	"crypto/tls"
@@ -16,15 +14,13 @@ import (
 	"github.com/cilium/cilium/hubble/pkg/defaults"
 	"github.com/cilium/cilium/pkg/time"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/timeout"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func Run(ctx context.Context, kc client.Client) {
+func Run(ctx context.Context, reportChan chan *report.Item) {
 
 	client, cleanup, err := newClient(ctx, "localhost:4443")
 	if err != nil {
@@ -43,7 +39,7 @@ func Run(ctx context.Context, kc client.Client) {
 		},
 	}
 
-	err = getFlows(ctx, client, kc, req)
+	err = getFlows(ctx, client, reportChan, req)
 	if err != nil {
 		panic(err)
 	}
@@ -86,7 +82,7 @@ func newConn(ctx context.Context, target string, dialTimeout time.Duration) (*gr
 	return conn, nil
 }
 
-func getFlows(ctx context.Context, client observerpb.ObserverClient, kc client.Client, req *observerpb.GetFlowsRequest) error {
+func getFlows(ctx context.Context, client observerpb.ObserverClient, reportChan chan *report.Item, req *observerpb.GetFlowsRequest) error {
 	b, err := client.GetFlows(ctx, req)
 	if err != nil {
 		return err
@@ -108,17 +104,7 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, kc client.C
 		switch r := resp.GetResponseTypes().(type) {
 		case *observerpb.GetFlowsResponse_Flow:
 			if !ignoreFlow(r.Flow) {
-				err = report.Update(ctx, kc, r.Flow.Source.Namespace,
-					r.Flow.Source.PodName,
-					func(pol *prv1alpha2.PolicyReport) error {
-						addResultFor(pol, r.Flow)
-						pol.Summary.Fail++
-						return nil
-					},
-				)
-			}
-			if err != nil {
-				return err
+				reportChan <- toItem(r.Flow)
 			}
 		}
 	}

@@ -16,9 +16,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-var scheme = runtime.NewScheme()
+func NewHandler() (Handler, error) {
+	client, err := initKubeClient()
+	if err != nil {
+		return nil, err
+	}
+	return &handler{
+		client: client,
+	}, nil
+}
 
-func NewKubeClient() (error, client.Client) {
+func initKubeClient() (client.Client, error) {
+	scheme := runtime.NewScheme()
 	utilruntime.Must(prv1alpha2.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
 
@@ -30,35 +39,33 @@ func NewKubeClient() (error, client.Client) {
 		panic(err)
 	}
 
-	kc, err := client.New(config, client.Options{Scheme: scheme})
-	return err, kc
+	return client.New(config, client.Options{Scheme: scheme})
 }
 
-func Update(ctx context.Context, kc client.Client, podNamespace string, podName string,
-	mutate func(pol *prv1alpha2.PolicyReport) error,
-) error {
+func (h *handler) Update(ctx context.Context, report *Item) error {
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
-		pol, err := getPolicyReport(ctx, kc, podNamespace, podName)
+		pol, err := h.getPolicyReport(ctx, report)
 		if err != nil {
 			return err
 		}
-		_, err = controllerutil.CreateOrUpdate(ctx, kc, pol, func() error {
-			return mutate(pol)
+		_, err = controllerutil.CreateOrUpdate(ctx, h.client, pol, func() error {
+			addResult(pol, report.result)
+			return nil
 		})
 		return err
 	})
 }
 
-func getPolicyReport(ctx context.Context, kc client.Client, podNamespace string, podName string) (*prv1alpha2.PolicyReport, error) {
+func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha2.PolicyReport, error) {
 
 	pod := &corev1.Pod{}
-	err := kc.Get(ctx, types.NamespacedName{Namespace: podNamespace, Name: podName}, pod)
+	err := h.client.Get(ctx, report.ObjectKey, pod)
 	if err != nil {
 		return nil, nil
 	}
 
 	pol := &prv1alpha2.PolicyReport{}
-	err = kc.Get(ctx, types.NamespacedName{Namespace: pod.GetNamespace(), Name: string(pod.GetUID())}, pol)
+	err = h.client.Get(ctx, types.NamespacedName{Namespace: pod.GetNamespace(), Name: string(pod.GetUID())}, pol)
 
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -69,7 +76,7 @@ func getPolicyReport(ctx context.Context, kc client.Client, podNamespace string,
 				},
 			}
 
-			_ = controllerutil.SetOwnerReference(pod, pol, kc.Scheme())
+			_ = controllerutil.SetOwnerReference(pod, pol, h.client.Scheme())
 			pol.Scope = &corev1.ObjectReference{
 				Namespace:  pod.Namespace,
 				Name:       pod.Name,
@@ -83,4 +90,19 @@ func getPolicyReport(ctx context.Context, kc client.Client, podNamespace string,
 	}
 
 	return pol, nil
+}
+
+func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResult) {
+	found := false
+
+	for i, res := range pol.Results {
+		if res.Source == result.Source && res.Policy == result.Policy {
+			pol.Results[i] = result
+			found = true
+		}
+	}
+
+	if !found {
+		pol.Results = append(pol.Results, result)
+	}
 }
