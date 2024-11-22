@@ -1,4 +1,4 @@
-package hubble
+package main
 
 // https://github.com/cilium/cilium/tree/main/hubble/cmd/observe
 
@@ -16,6 +16,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func main() {
+
+}
 
 func a(ctx context.Context, hubbleServer string, timeout time.Duration) error {
 

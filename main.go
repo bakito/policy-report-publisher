@@ -5,10 +5,13 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	kspAPI "github.com/kubearmor/KubeArmor/pkg/KubeArmorController/api/security.kubearmor.com/v1"
+	policyreportv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"github.com/kyverno/policy-reporter-plugins/example/api"
 	_ "github.com/kyverno/policy-reporter-plugins/example/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"k8s.io/client-go/kubernetes/scheme"
 )
 
 //	@title			Policy Reporter UI Plugin Example API
@@ -21,6 +24,10 @@ import (
 // @host		localhost:8080
 // @BasePath	/api
 func main() {
+
+	_ = policyreportv1alpha2.AddToScheme(scheme.Scheme)
+	_ = kspAPI.AddToScheme(scheme.Scheme)
+
 	client := api.NewClient()
 
 	r := gin.Default()
