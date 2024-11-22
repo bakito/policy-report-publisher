@@ -1,4 +1,4 @@
-package main
+package hubble
 
 // https://github.com/cilium/cilium/tree/main/hubble/cmd/observe
 
@@ -8,37 +8,30 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
+	"github.com/bakito/policy-reporter-plugin/pkg/report"
 	"github.com/cilium/cilium/api/v1/flow"
 	observerpb "github.com/cilium/cilium/api/v1/observer"
-	"github.com/cilium/cilium/hubble/cmd"
 	"github.com/cilium/cilium/hubble/pkg/defaults"
 	"github.com/cilium/cilium/pkg/time"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/timeout"
+	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func main() {
-	if false {
-		if err := cmd.Execute(); err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-	}
-
-	ctx := context.TODO()
+func Run(ctx context.Context, kc client.Client) {
 
 	client, cleanup, err := newClient(ctx, "localhost:4443")
 	if err != nil {
 		panic(err)
 	}
 
-	defer cleanup()
+	defer func() { _ = cleanup() }()
 
 	req := &observerpb.GetFlowsRequest{
 		Follow: true,
@@ -50,7 +43,7 @@ func main() {
 		},
 	}
 
-	err = getFlows(ctx, client, req)
+	err = getFlows(ctx, client, kc, req)
 	if err != nil {
 		panic(err)
 	}
@@ -93,7 +86,7 @@ func newConn(ctx context.Context, target string, dialTimeout time.Duration) (*gr
 	return conn, nil
 }
 
-func getFlows(ctx context.Context, client observerpb.ObserverClient, req *observerpb.GetFlowsRequest) error {
+func getFlows(ctx context.Context, client observerpb.ObserverClient, kc client.Client, req *observerpb.GetFlowsRequest) error {
 	b, err := client.GetFlows(ctx, req)
 	if err != nil {
 		return err
@@ -114,7 +107,19 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, req *observ
 
 		switch r := resp.GetResponseTypes().(type) {
 		case *observerpb.GetFlowsResponse_Flow:
-			println(r)
+			if r.Flow != nil {
+				err = report.Update(ctx, kc, r.Flow.Source.Namespace,
+					r.Flow.Source.PodName,
+					func(pol *prv1alpha2.PolicyReport) error {
+						addResultFor(pol, r.Flow)
+						pol.Summary.Fail++
+						return nil
+					},
+				)
+			}
+			if err != nil {
+				return err
+			}
 		}
 	}
 }
