@@ -41,6 +41,7 @@ func main() {
 	defer cleanup()
 
 	req := &observerpb.GetFlowsRequest{
+		Follow: true,
 		Whitelist: []*flow.FlowFilter{
 			{
 				TrafficDirection: []flow.TrafficDirection{flow.TrafficDirection_EGRESS},
