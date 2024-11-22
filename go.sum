@@ -60,6 +60,8 @@ github.com/go-errors/errors v1.5.1 h1:ZwEMSLRCapFLflTpT7NKaAc7ukJ8ZPEjzlxt8rPN8b
 github.com/go-errors/errors v1.5.1/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
 github.com/go-logr/logr v1.4.1 h1:pKouT5E8xu9zeFC39JXRDukb6JFQPXM5p5I91188VAQ=
 github.com/go-logr/logr v1.4.1/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
+github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
+github.com/go-logr/logr v1.4.2/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=
 github.com/go-logr/stdr v1.2.2/go.mod h1:mMo/vtBO5dYbehREoey6XUKy/eSumjCCveDpRre4VKE=
 github.com/go-logr/zapr v1.3.0 h1:XGdV8XW8zdwFiwOA2Dryh1gj2KRQyOOoNmBy4EplIcQ=
@@ -153,6 +155,8 @@ github.com/kubearmor/KubeArmor/KubeArmor v0.0.0-20240313131335-9ae900daa38d h1:j
 github.com/kubearmor/KubeArmor/KubeArmor v0.0.0-20240313131335-9ae900daa38d/go.mod h1:5eM22M0j5Z+v2o6J4QQ2mMfQlNhrwV3m1QV+S2xleVU=
 github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20240313131335-9ae900daa38d h1:49xunpov87G7+qbsQBukblzceJIxW/DoFk8Kc5NwxA8=
 github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20240313131335-9ae900daa38d/go.mod h1:V80Of4c0Obz2xoUhuDyNVa9Og9P1zzg6KocUr8D8PPo=
+github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20241107060530-2cfc2e24d13e h1:iI+7cCwzQIW1Ru413yDmlleegnNq6ECRQiGO4VhZsvc=
+github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20241107060530-2cfc2e24d13e/go.mod h1:Q9PUbza1ZG/kBdFSV+wVjWy+30xaD/vwx2p6lpzP+4U=
 github.com/kubearmor/KubeArmor/protobuf v0.0.0-20240313131335-9ae900daa38d h1:317tV+F/M/xHeqAj8+3GSA86h9M5LiE4ml1Lcm5eTs4=
 github.com/kubearmor/KubeArmor/protobuf v0.0.0-20240313131335-9ae900daa38d/go.mod h1:w4r1uqpCe02IbEjm0X43Dv6v4gfyOGgspFrMzapqQ+Q=
 github.com/kubearmor/kubearmor-client v1.2.3 h1:vFSE1uJ95pjgPFDC11K/fa83w86wM4hpUtD1nwEbAiE=

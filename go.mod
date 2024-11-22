@@ -7,7 +7,8 @@ replace github.com/kyverno/policy-reporter-plugins/sdk/api v0.0.0 => github.com/
 require (
 	github.com/cilium/cilium v1.16.4
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20240313131335-9ae900daa38d
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
+	github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20241107060530-2cfc2e24d13e
 	github.com/kubearmor/kubearmor-client v1.2.3
 	github.com/kyverno/kyverno v1.9.2
 	github.com/kyverno/policy-reporter-plugins/example v0.0.0-20241121153219-eddcb0ae6453
@@ -40,7 +41,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
-	github.com/go-logr/logr v1.4.1 // indirect
+	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-openapi/analysis v0.23.0 // indirect
 	github.com/go-openapi/errors v0.22.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -65,7 +66,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
