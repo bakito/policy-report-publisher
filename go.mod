@@ -7,6 +7,7 @@ replace github.com/kyverno/policy-reporter-plugins/sdk/api v0.0.0 => github.com/
 require (
 	github.com/cilium/cilium v1.16.4
 	github.com/gin-gonic/gin v1.9.1
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20240313131335-9ae900daa38d
 	github.com/kubearmor/kubearmor-client v1.2.3
 	github.com/kyverno/kyverno v1.9.2
@@ -14,7 +15,7 @@ require (
 	github.com/kyverno/policy-reporter-plugins/sdk/api v0.0.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
-	github.com/swaggo/swag v1.16.2
+	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.64.0
 	k8s.io/api v0.30.2
 	k8s.io/apimachinery v0.30.2
@@ -65,7 +66,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
