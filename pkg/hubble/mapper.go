@@ -1,6 +1,7 @@
 package hubble
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/cilium/cilium/api/v1/flow"
@@ -12,11 +13,11 @@ const reportSource = "Cilium Hubble"
 
 func addResultFor(pol *prv1alpha2.PolicyReport, f *flow.Flow) {
 
-	policy := "TODO"
+	policy := "Egress Network Policy"
 
 	pr := prv1alpha2.PolicyReportResult{
 		Category: f.TrafficDirection.String(),
-		Message:  "TODO",
+		Message:  f.DropReasonDesc.String(),
 
 		Severity: "high",
 		Policy:   policy,
@@ -33,10 +34,19 @@ func addResultFor(pol *prv1alpha2.PolicyReport, f *flow.Flow) {
 			Nanos: f.Time.GetNanos(),
 		},
 		Properties: map[string]string{
-			"Destination": "TODO",
-			"Port":        "TODO",
 			"UpdatedTime": f.GetTime().AsTime().Format(time.RFC3339),
 		},
+	}
+
+	if f.L4 != nil {
+		if f.L4.GetTCP() != nil {
+			for _, name := range f.DestinationNames {
+				pr.Properties[name] = fmt.Sprintf("%d", f.L4.GetTCP().DestinationPort)
+			}
+		} else if f.L4.GetICMPv4() != nil {
+			pr.Properties["ping "+f.IP.Destination] =
+				fmt.Sprintf("type: %d / code: %d", f.L4.GetICMPv4().Type, f.L4.GetICMPv4().Code)
+		}
 	}
 
 	found := false

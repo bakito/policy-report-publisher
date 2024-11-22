@@ -107,7 +107,7 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, kc client.C
 
 		switch r := resp.GetResponseTypes().(type) {
 		case *observerpb.GetFlowsResponse_Flow:
-			if r.Flow != nil {
+			if !ignoreFlow(r.Flow) {
 				err = report.Update(ctx, kc, r.Flow.Source.Namespace,
 					r.Flow.Source.PodName,
 					func(pol *prv1alpha2.PolicyReport) error {
@@ -122,4 +122,8 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, kc client.C
 			}
 		}
 	}
+}
+
+func ignoreFlow(f *flow.Flow) bool {
+	return f != nil && f.L4 != nil && (f.L4.GetTCP() != nil || f.L4.GetICMPv4() != nil)
 }
