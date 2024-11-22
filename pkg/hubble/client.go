@@ -5,6 +5,8 @@ package hubble
 import (
 	"context"
 	"errors"
+	"io"
+
 	observerpb "github.com/cilium/cilium/api/v1/observer"
 	"github.com/cilium/cilium/hubble/cmd/common/conn"
 	"github.com/cilium/cilium/hubble/pkg/logger"
@@ -13,7 +15,6 @@ import (
 	"github.com/cilium/cilium/pkg/time"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"io"
 )
 
 func a(ctx context.Context, hubbleServer string, timeout time.Duration) error {

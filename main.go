@@ -5,11 +5,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
 	"github.com/kyverno/policy-reporter-plugins/example/api"
 	_ "github.com/kyverno/policy-reporter-plugins/example/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 //	@title			Policy Reporter UI Plugin Example API

@@ -1,16 +1,19 @@
-package kubearmor
+package main
 
 // https://github.com/kubearmor/kubearmor-client/blob/main/cmd/log.go
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/kubearmor/kubearmor-client/k8s"
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"
-	"github.com/kubearmor/kubearmor-client/profile"
 	"github.com/kubearmor/kubearmor-client/utils"
-	"os"
-	"strconv"
+	"github.com/kyverno/policy-reporter-plugins/sdk/api"
 )
 
 const envKubearmorSvc = "KUBEARMOR_SERVICE"
@@ -20,18 +23,36 @@ var (
 	matchLabels       = map[string]string{"kubearmor-app": "kubearmor-relay"}
 )
 
-func a() {
+func main() {
 
 	eventChan := make(chan klog.EventInfo)
 	o := log.Options{
 		EventChan: eventChan,
+		LogFilter: "all",
 	}
 	cl, _ := NewLogClient(o)
 	go cl.WatchAlerts(o)
 
 	// Consume events from the channel
 	for event := range eventChan {
-		fmt.Println(string(event.Data))
+		a := &Alert{}
+		json.Unmarshal(event.Data, a)
+		fmt.Println(a.Action)
+
+		p := &api.Policy{
+			Category:    v.Category,
+			Name:        v.ID,
+			Title:       v.Title,
+			Description: v.Description,
+			Severity:    v.Severity,
+			Details:     make([]api.DetailsItem, 0),
+			References:  make([]api.Reference, 0, len(v.References)),
+			Engine: &api.Engine{
+				Name:     "Trivy",
+				Subjects: []string{"Pod", "ReplicaSet"},
+			},
+		}
+		println(p.Name)
 	}
 
 }
@@ -64,4 +85,40 @@ func NewLogClient(o log.Options) (*log.Feeder, error) {
 	}
 
 	return log.NewClient(gRPC, o, client.K8sClientset)
+}
+
+type Alert struct {
+	Timestamp     int       `json:"Timestamp"`
+	UpdatedTime   time.Time `json:"UpdatedTime"`
+	ClusterName   string    `json:"ClusterName"`
+	HostName      string    `json:"HostName"`
+	NamespaceName string    `json:"NamespaceName"`
+	Owner         struct {
+		Ref       string `json:"Ref"`
+		Name      string `json:"Name"`
+		Namespace string `json:"Namespace"`
+	} `json:"Owner"`
+	PodName           string `json:"PodName"`
+	Labels            string `json:"Labels"`
+	ContainerID       string `json:"ContainerID"`
+	ContainerName     string `json:"ContainerName"`
+	ContainerImage    string `json:"ContainerImage"`
+	HostPPID          int    `json:"HostPPID"`
+	HostPID           int    `json:"HostPID"`
+	PPID              int    `json:"PPID"`
+	PID               int    `json:"PID"`
+	UID               int    `json:"UID"`
+	ParentProcessName string `json:"ParentProcessName"`
+	ProcessName       string `json:"ProcessName"`
+	PolicyName        string `json:"PolicyName"`
+	Severity          string `json:"Severity"`
+	Type              string `json:"Type"`
+	Source            string `json:"Source"`
+	Operation         string `json:"Operation"`
+	Resource          string `json:"Resource"`
+	Data              string `json:"Data"`
+	Enforcer          string `json:"Enforcer"`
+	Action            string `json:"Action"`
+	Result            string `json:"Result"`
+	Cwd               string `json:"Cwd"`
 }
