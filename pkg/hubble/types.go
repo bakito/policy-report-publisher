@@ -1,6 +1,7 @@
 package hubble
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bakito/policy-reporter-plugin/pkg/report"
@@ -12,7 +13,7 @@ import (
 const reportSource = "Cilium Hubble"
 
 func toItem(f *flow.Flow) *report.Item {
-	return report.ItemFor(f.Source.Namespace, f.Source.PodName, prv1alpha2.PolicyReportResult{
+	pr := prv1alpha2.PolicyReportResult{
 		Category: f.TrafficDirection.String(),
 		Message:  f.DropReasonDesc.String(),
 
@@ -33,6 +34,18 @@ func toItem(f *flow.Flow) *report.Item {
 		Properties: map[string]string{
 			"UpdatedTime": f.GetTime().AsTime().Format(time.RFC3339),
 		},
-	},
-	)
+	}
+
+	if f.L4 != nil {
+		if f.L4.GetTCP() != nil {
+			for _, name := range f.DestinationNames {
+				pr.Properties[name] = fmt.Sprintf("%d", f.L4.GetTCP().DestinationPort)
+			}
+		} else if f.L4.GetICMPv4() != nil {
+			pr.Properties["ping "+f.IP.Destination] =
+				fmt.Sprintf("type: %d / code: %d", f.L4.GetICMPv4().Type, f.L4.GetICMPv4().Code)
+		}
+	}
+
+	return report.ItemFor(f.Source.Namespace, f.Source.PodName, pr)
 }

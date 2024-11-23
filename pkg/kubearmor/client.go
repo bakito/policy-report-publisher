@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/bakito/policy-reporter-plugin/pkg/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"
-	"os"
 )
 
 const (
