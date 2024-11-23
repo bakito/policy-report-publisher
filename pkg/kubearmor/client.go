@@ -3,6 +3,7 @@ package kubearmor
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -20,28 +21,45 @@ var (
 	matchLabels       = map[string]string{"kubearmor-app": "kubearmor-relay"}
 )
 
-func Run(ctx context.Context, reportChan chan *report.Item) {
+func Run(ctx context.Context, reportChan chan *report.Item) error {
 
 	eventChan := make(chan klog.EventInfo)
 	o := log.Options{
 		EventChan: eventChan,
 		LogFilter: "all",
 	}
-	cl, _, _ := NewLogClient(o)
+	cl, err := NewLogClient(o)
+	if err != nil {
+		return err
+	}
+
+	errChan := make(chan error, 1)
 	go func() {
 		if err := cl.WatchAlerts(o); err != nil {
-			panic(err)
+			errChan <- err
 		}
 	}()
 
-	for event := range eventChan {
-		a := &Alert{}
-		_ = json.Unmarshal(event.Data, a)
-		reportChan <- a.toItem()
+	for {
+		select {
+		case err := <-errChan:
+			close(eventChan)
+			return err
+		case <-ctx.Done():
+			close(eventChan)
+			return nil
+		case event := <-eventChan:
+			a := &Alert{}
+			if err := json.Unmarshal(event.Data, a); err != nil {
+				return fmt.Errorf("error unmarshalling alert: %w", err)
+			}
+
+			reportChan <- a.toItem()
+		}
 	}
 }
 
-func NewLogClient(o klog.Options) (*klog.Feeder, *k8s.Client, error) {
+func NewLogClient(o klog.Options) (*klog.Feeder, error) {
 
 	gRPC := ""
 
@@ -50,7 +68,7 @@ func NewLogClient(o klog.Options) (*klog.Feeder, *k8s.Client, error) {
 	client, err := k8s.ConnectK8sClient()
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if o.GRPC != "" {
@@ -60,11 +78,11 @@ func NewLogClient(o klog.Options) (*klog.Feeder, *k8s.Client, error) {
 	} else {
 		pf, err := utils.InitiatePortForward(client, port, port, matchLabels, targetSvc)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		gRPC = "localhost:" + strconv.FormatInt(pf.LocalPort, 10)
 	}
 
 	lc, err := log.NewClient(gRPC, o, client.K8sClientset)
-	return lc, client, err
+	return lc, err
 }

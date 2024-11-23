@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/bakito/policy-reporter-plugin/pkg/hubble"
 	"github.com/bakito/policy-reporter-plugin/pkg/kubearmor"
@@ -9,22 +13,45 @@ import (
 )
 
 func main() {
+	// Initialize the report handler
 	handler, err := report.NewHandler()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to create report handler: %v", err)
 	}
 
-	ctx := context.TODO()
+	// Create a cancellable context for graceful shutdown
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	reportChan := make(chan *report.Item)
+	// Create a channel for reports
+	reportChan := make(chan *report.Item, 100) // Buffered for performance
 
-	go kubearmor.Run(ctx, reportChan)
-	go hubble.Run(ctx, reportChan)
+	// Handle OS signals for graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		log.Println("Shutting down gracefully...")
+		cancel()
+		close(reportChan)
+	}()
 
+	// Start kubearmor and hubble as producers
+	go func() {
+		if err := kubearmor.Run(ctx, reportChan); err != nil {
+			log.Printf("kubearmor.Run exited with error: %v", err)
+		}
+	}()
+	go func() {
+		if err := hubble.Run(ctx, reportChan); err != nil {
+			log.Printf("hubble.Run exited with error: %v", err)
+		}
+	}()
+
+	// Process reports from the channel
 	for report := range reportChan {
-		err := handler.Update(ctx, report)
-		if err != nil {
-			panic(err)
+		if err := handler.Update(ctx, report); err != nil {
+			log.Printf("Failed to update report: %v", err)
 		}
 	}
 }

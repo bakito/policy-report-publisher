@@ -20,11 +20,11 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func Run(ctx context.Context, reportChan chan *report.Item) {
+func Run(ctx context.Context, reportChan chan *report.Item) error {
 
 	client, cleanup, err := newClient(ctx, "localhost:4443")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer func() { _ = cleanup() }()
@@ -39,10 +39,7 @@ func Run(ctx context.Context, reportChan chan *report.Item) {
 		},
 	}
 
-	err = getFlows(ctx, client, reportChan, req)
-	if err != nil {
-		panic(err)
-	}
+	return getFlows(ctx, client, reportChan, req)
 }
 
 func newClient(ctx context.Context, hubbleServer string) (observerpb.ObserverClient, func() error, error) {
