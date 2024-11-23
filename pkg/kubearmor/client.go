@@ -4,21 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
-
 	"github.com/bakito/policy-reporter-plugin/pkg/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"
-	"github.com/kubearmor/kubearmor-client/utils"
+	"os"
 )
 
-const envKubearmorSvc = "KUBEARMOR_SERVICE"
-
-var (
-	port        int64 = 32767
-	matchLabels       = map[string]string{"kubearmor-app": "kubearmor-relay"}
+const (
+	envServiceName = "KUBEARMOR_SERVICE"
 )
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
@@ -28,7 +22,7 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 		EventChan: eventChan,
 		LogFilter: "all",
 	}
-	cl, err := NewLogClient(o)
+	cl, err := newLogClient(o)
 	if err != nil {
 		return err
 	}
@@ -59,30 +53,14 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 	}
 }
 
-func NewLogClient(o klog.Options) (*klog.Feeder, error) {
-
-	gRPC := ""
-
-	targetSvc := "kubearmor-relay"
-
-	client, err := k8s.ConnectK8sClient()
-
-	if err != nil {
-		return nil, err
-	}
-
-	if o.GRPC != "" {
-		gRPC = o.GRPC
-	} else if val, ok := os.LookupEnv(envKubearmorSvc); ok {
-		gRPC = val
-	} else {
-		pf, err := utils.InitiatePortForward(client, port, port, matchLabels, targetSvc)
+func newLogClient(o klog.Options) (*klog.Feeder, error) {
+	if gRPC, ok := os.LookupEnv(envServiceName); ok {
+		client, err := k8s.ConnectK8sClient()
 		if err != nil {
 			return nil, err
 		}
-		gRPC = "localhost:" + strconv.FormatInt(pf.LocalPort, 10)
+		return log.NewClient(gRPC, o, client.K8sClientset)
 	}
 
-	lc, err := log.NewClient(gRPC, o, client.K8sClientset)
-	return lc, err
+	return nil, fmt.Errorf("kubearmor service name variable must %q be set", envServiceName)
 }

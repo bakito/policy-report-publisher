@@ -43,6 +43,9 @@ func initKubeClient() (client.Client, error) {
 }
 
 func (h *handler) Update(ctx context.Context, report *Item) error {
+	if report.Name == "" {
+		return nil
+	}
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		pol, err := h.getPolicyReport(ctx, report)
 		if err != nil {
@@ -64,15 +67,17 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 		return nil, nil
 	}
 
+	podID := string(pod.GetUID())
+
 	pol := &prv1alpha2.PolicyReport{}
-	err = h.client.Get(ctx, types.NamespacedName{Namespace: pod.GetNamespace(), Name: string(pod.GetUID())}, pol)
+	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: podID}, pol)
 
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &prv1alpha2.PolicyReport{
 				ObjectMeta: metav1.ObjectMeta{
-					Namespace: pod.GetNamespace(),
-					Name:      string(pod.GetUID()),
+					Namespace: report.Namespace,
+					Name:      podID,
 				},
 			}
 
@@ -105,4 +110,5 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 	if !found {
 		pol.Results = append(pol.Results, result)
 	}
+	pol.Summary.Fail++
 }

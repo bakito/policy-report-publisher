@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/bakito/policy-reporter-plugin/pkg/report"
@@ -20,9 +21,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const (
+	envServiceName = "HUBBLE_SERVICE"
+)
+
 func Run(ctx context.Context, reportChan chan *report.Item) error {
 
-	client, cleanup, err := newClient(ctx, "localhost:4443")
+	client, cleanup, err := newClient(ctx)
 	if err != nil {
 		return err
 	}
@@ -42,10 +47,16 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 	return getFlows(ctx, client, reportChan, req)
 }
 
-func newClient(ctx context.Context, hubbleServer string) (observerpb.ObserverClient, func() error, error) {
+func newClient(ctx context.Context) (observerpb.ObserverClient, func() error, error) {
+	var gRPC string
+	if val, ok := os.LookupEnv(envServiceName); ok {
+		gRPC = val
+	} else {
+		return nil, nil, fmt.Errorf("hubble service name variable must %q be set", envServiceName)
+	}
 
 	// read flows from a hubble server
-	hubbleConn, err := newConn(ctx, hubbleServer, 5*time.Second)
+	hubbleConn, err := newConn(ctx, gRPC, 5*time.Second)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -68,7 +79,8 @@ func newConn(ctx context.Context, target string, dialTimeout time.Duration) (*gr
 	creds := credentials.NewTLS(&tlsConfig)
 
 	t := strings.TrimPrefix(target, defaults.TargetTLSPrefix)
-	conn, err := grpc.DialContext(dialCtx, t, grpc.WithTransportCredentials(creds),
+	conn, err := grpc.DialContext(dialCtx, t,
+		grpc.WithTransportCredentials(creds),
 		grpc.WithBlock(),
 		grpc.FailOnNonTempDialError(true),
 		grpc.WithReturnConnectionError(),
@@ -108,5 +120,6 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, reportChan 
 }
 
 func ignoreFlow(f *flow.Flow) bool {
-	return f != nil && f.L4 != nil && (f.L4.GetTCP() != nil || f.L4.GetICMPv4() != nil)
+	return f == nil || f.Source == nil || f.Source.PodName == "" ||
+		f.L4 == nil || (f.L4.GetTCP() == nil && f.L4.GetICMPv4() == nil)
 }

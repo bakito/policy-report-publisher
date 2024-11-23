@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -13,6 +14,17 @@ import (
 )
 
 func main() {
+	var withHubble bool
+	var withKubeArmor bool
+
+	flag.BoolVar(&withHubble, "hubble", false, "enable hubble")
+	flag.BoolVar(&withKubeArmor, "kubearmor", false, "enable kubearmor")
+	flag.Parse()
+
+	if !withKubeArmor && !withHubble {
+		log.Fatalf("either 'hubble' or 'kubearmor' must be enabled")
+	}
+
 	// Initialize the report handler
 	handler, err := report.NewHandler()
 	if err != nil {
@@ -33,20 +45,23 @@ func main() {
 		<-sigChan
 		log.Println("Shutting down gracefully...")
 		cancel()
-		close(reportChan)
 	}()
 
-	// Start kubearmor and hubble as producers
-	go func() {
-		if err := kubearmor.Run(ctx, reportChan); err != nil {
-			log.Printf("kubearmor.Run exited with error: %v", err)
-		}
-	}()
-	go func() {
-		if err := hubble.Run(ctx, reportChan); err != nil {
-			log.Printf("hubble.Run exited with error: %v", err)
-		}
-	}()
+	if withKubeArmor {
+		// Start kubearmor and hubble as producers
+		go func() {
+			if err := kubearmor.Run(ctx, reportChan); err != nil {
+				log.Printf("kubearmor.Run exited with error: %v", err)
+			}
+		}()
+	}
+	if withHubble {
+		go func() {
+			if err := hubble.Run(ctx, reportChan); err != nil {
+				log.Printf("hubble.Run exited with error: %v", err)
+			}
+		}()
+	}
 
 	// Process reports from the channel
 	for report := range reportChan {
