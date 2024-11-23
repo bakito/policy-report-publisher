@@ -48,7 +48,6 @@ func main() {
 	}()
 
 	if withKubeArmor {
-		// Start kubearmor and hubble as producers
 		go func() {
 			if err := kubearmor.Run(ctx, reportChan); err != nil {
 				log.Printf("kubearmor.Run exited with error: %v", err)
@@ -64,9 +63,20 @@ func main() {
 	}
 
 	// Process reports from the channel
-	for report := range reportChan {
-		if err := handler.Update(ctx, report); err != nil {
-			log.Printf("Failed to update report: %v", err)
+	for {
+		select {
+		case report, ok := <-reportChan:
+			if !ok {
+				// Channel closed, exit loop
+				return
+			}
+			if err := handler.Update(ctx, report); err != nil {
+				log.Printf("Failed to update report: %v", err)
+			}
+		case <-ctx.Done():
+			// Context is done, exit loop
+			log.Println("Context done, exiting report processing loop.")
+			return
 		}
 	}
 }
