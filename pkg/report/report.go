@@ -11,22 +11,26 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/util/retry"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
+var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
+
 func NewHandler() (Handler, error) {
-	client, err := initKubeClient()
+	client, dcl, err := initKubeClient()
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
-		client: client,
+		client:    client,
+		discovery: dcl,
 	}, nil
 }
 
-func initKubeClient() (client.Client, error) {
+func initKubeClient() (client.Client, *discovery.DiscoveryClient, error) {
 	scheme := runtime.NewScheme()
 	utilruntime.Must(prv1alpha2.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
@@ -36,10 +40,33 @@ func initKubeClient() (client.Client, error) {
 
 	config, err := rawKubeConfigLoader.ClientConfig()
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
-	return client.New(config, client.Options{Scheme: scheme})
+	dcl, err := discovery.NewDiscoveryClientForConfig(config)
+	if err != nil {
+		return nil, nil, err
+	}
+	cl, err := client.New(config, client.Options{Scheme: scheme})
+	return cl, dcl, err
+}
+
+func (h *handler) PolicyReportAvailable() (bool, error) {
+	resources, err := h.discovery.ServerPreferredResources()
+	if err != nil {
+		return false, err
+	}
+
+	for _, res := range resources {
+		if res.GroupVersion == PolicyReport.APIVersion {
+			for _, r := range res.APIResources {
+				if r.Kind == PolicyReport.Kind {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, nil
 }
 
 func (h *handler) Update(ctx context.Context, report *Item) error {

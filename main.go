@@ -41,6 +41,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	ok, err := handler.PolicyReportAvailable()
+	if err != nil {
+		slog.Error("could not check if PolicyReport is available", "error", err)
+		os.Exit(1)
+	}
+	if !ok {
+		slog.Error("PolicyReport CRD is not available, please install kyverno",
+			"APIVersion", report.PolicyReport.APIVersion,
+			"Kind", report.PolicyReport.Kind,
+		)
+		os.Exit(1)
+	}
+
 	// Create a cancellable context for graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
