@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,6 +14,11 @@ import (
 	"github.com/bakito/policy-report-publisher/version"
 )
 
+func init() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+}
+
 func main() {
 	var withHubble bool
 	var withKubeArmor bool
@@ -23,15 +28,17 @@ func main() {
 	flag.Parse()
 
 	if !withKubeArmor && !withHubble {
-		log.Fatalf("either 'hubble' or 'kubearmor' must be enabled")
+		slog.Error("either 'hubble' or 'kubearmor' must be enabled")
+		os.Exit(1)
 	}
 
-	log.Printf("policy-report-publisher %s", version.Version)
+	slog.Info("policy-report-publisher", "version", version.Version, "hubble", withHubble, "kubearmor", withKubeArmor)
 
 	// Initialize the report handler
 	handler, err := report.NewHandler()
 	if err != nil {
-		log.Fatalf("Failed to create report handler: %v", err)
+		slog.Error("failed to create report handler", "error", err)
+		os.Exit(1)
 	}
 
 	// Create a cancellable context for graceful shutdown
@@ -46,21 +53,23 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		log.Println("Shutting down gracefully...")
+		slog.Info("Shutting down gracefully...")
 		cancel()
 	}()
 
 	if withKubeArmor {
 		go func() {
 			if err := kubearmor.Run(ctx, reportChan); err != nil {
-				log.Printf("kubearmor.Run exited with error: %v", err)
+				slog.Error("kubearmor.Run exited with error", "error", err)
+				cancel()
 			}
 		}()
 	}
 	if withHubble {
 		go func() {
 			if err := hubble.Run(ctx, reportChan); err != nil {
-				log.Printf("hubble.Run exited with error: %v", err)
+				slog.Error("hubble.Run exited with error", "error", err)
+				cancel()
 			}
 		}()
 	}
@@ -74,11 +83,11 @@ func main() {
 				return
 			}
 			if err := handler.Update(ctx, report); err != nil {
-				log.Printf("Failed to update report: %v", err)
+				slog.Error("Failed to update report", "error", err)
 			}
 		case <-ctx.Done():
 			// Context is done, exit loop
-			log.Println("Context done, exiting report processing loop.")
+			slog.Info("Context done, exiting report processing loop.")
 			return
 		}
 	}
