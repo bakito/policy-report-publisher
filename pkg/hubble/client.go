@@ -18,11 +18,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
 const (
 	envServiceName = "HUBBLE_SERVICE"
+	envInsecure    = "HUBBLE_INSECURE"
 )
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
@@ -68,22 +70,21 @@ func newClient(ctx context.Context) (observerpb.ObserverClient, func() error, er
 }
 
 // New creates a new gRPC client connection to the target.
-func newConn(ctx context.Context, target string, dialTimeout time.Duration) (*grpc.ClientConn, error) {
-	dialCtx, cancel := context.WithTimeout(ctx, dialTimeout)
-	defer cancel()
+func newConn(ctx context.Context, target string, _ time.Duration) (*grpc.ClientConn, error) {
 
-	tlsConfig := tls.Config{
-		InsecureSkipVerify: true, // #nosec G402
+	var creds credentials.TransportCredentials
+
+	if i, ok := os.LookupEnv(envInsecure); ok && strings.EqualFold(i, "true") {
+		creds = insecure.NewCredentials()
+	} else {
+		tlsConfig := tls.Config{
+			InsecureSkipVerify: true, // #nosec G402
+		}
+		creds = credentials.NewTLS(&tlsConfig)
 	}
-
-	creds := credentials.NewTLS(&tlsConfig)
-
 	t := strings.TrimPrefix(target, defaults.TargetTLSPrefix)
-	conn, err := grpc.DialContext(dialCtx, t,
+	conn, err := grpc.NewClient(t,
 		grpc.WithTransportCredentials(creds),
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-		grpc.WithReturnConnectionError(),
 		grpc.WithUnaryInterceptor(timeout.UnaryClientInterceptor(12*time.Second)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to '%s': %w", target, err)
