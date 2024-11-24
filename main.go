@@ -8,9 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bakito/policy-reporter-plugin/pkg/hubble"
-	"github.com/bakito/policy-reporter-plugin/pkg/kubearmor"
-	"github.com/bakito/policy-reporter-plugin/pkg/report"
+	"github.com/bakito/policy-report-publisher/pkg/hubble"
+	"github.com/bakito/policy-report-publisher/pkg/kubearmor"
+	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/version"
 )
 
 func main() {
@@ -24,6 +25,8 @@ func main() {
 	if !withKubeArmor && !withHubble {
 		log.Fatalf("either 'hubble' or 'kubearmor' must be enabled")
 	}
+
+	log.Printf("policy-report-publisher %s", version.Version)
 
 	// Initialize the report handler
 	handler, err := report.NewHandler()

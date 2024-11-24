@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bakito/policy-reporter-plugin/pkg/report"
+	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"

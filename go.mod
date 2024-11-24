@@ -1,4 +1,4 @@
-module github.com/bakito/policy-reporter-plugin
+module github.com/bakito/policy-report-publisher
 
 go 1.23.3
 
