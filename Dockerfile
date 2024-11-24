@@ -18,7 +18,7 @@ FROM scratch
 WORKDIR /opt/go
 
 LABEL maintainer="bakito <github@bakito.ch>"
-USER 1001
+USER 12021
 ENTRYPOINT ["/opt/go/policy-report-publisher"]
 
 COPY --from=builder /build/policy-report-publisher /opt/go/policy-report-publisher
