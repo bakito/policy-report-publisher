@@ -2,26 +2,17 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log/slog"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 
+	"github.com/bakito/policy-report-publisher/pkg/env"
 	"github.com/bakito/policy-report-publisher/pkg/hubble"
 	"github.com/bakito/policy-report-publisher/pkg/kubearmor"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/bakito/policy-report-publisher/version"
-)
-
-const envPodNamespace = "POD_NAMESPACE"
-
-var (
-	withHubble     bool
-	withKubeArmor  bool
-	logReports     bool
-	leaderElection bool
 )
 
 func init() {
@@ -30,22 +21,21 @@ func init() {
 }
 
 func main() {
-	flag.BoolVar(&withHubble, "hubble", false, "enable hubble")
-	flag.BoolVar(&withKubeArmor, "kubearmor", false, "enable kubearmor")
-	flag.BoolVar(&logReports, "log-reports", false, "if enabled, the reports are logged to std out")
-	flag.BoolVar(&leaderElection, "leader-election", false, "enable leader-election")
-	flag.Parse()
 
-	if !withKubeArmor && !withHubble {
-		slog.Error("either 'hubble' or 'kubearmor' must be enabled")
+	if env.Empty(env.HubbleServiceName) && env.Empty(env.KubeArmorServiceName) {
+		slog.Error("either 'Hubble' or 'KubeArmor' must be enabled",
+			"hubble", env.HubbleServiceName,
+			"kubearmor", env.KubeArmorServiceName)
 		os.Exit(1)
 	}
 
-	slog.Info("policy-report-publisher", "version", version.Version, "hubble", withHubble,
-		"kubearmor", withKubeArmor, "log-reports", logReports)
+	slog.Info("policy-report-publisher", "version", version.Version,
+		"hubble", os.Getenv(env.HubbleServiceName),
+		"kubearmor", os.Getenv(env.KubeArmorServiceName),
+		"log-reports", env.Active(env.LogReports))
 
 	// Initialize the report handler
-	handler, err := report.NewHandler(logReports)
+	handler, err := report.NewHandler()
 	if err != nil {
 		slog.Error("failed to create report handler", "error", err)
 		os.Exit(1)
@@ -69,14 +59,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if leaderElection {
-		if ns, ok := os.LookupEnv(envPodNamespace); ok && strings.TrimSpace(ns) != "" {
-			if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {
-				slog.Error("error running with leader election", "error", err)
-				os.Exit(1)
-			}
-		} else {
-			slog.Error("pod namespace must be defined when leader election is enabled", "variable", envPodNamespace)
+	if ns, ok := os.LookupEnv(env.LeaderElectionNS); ok && strings.TrimSpace(ns) != "" {
+		if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {
+			slog.Error("error running with leader election", "error", err)
 			os.Exit(1)
 		}
 	} else {
@@ -97,22 +82,8 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 		cancel()
 	}()
 
-	if withKubeArmor {
-		go func() {
-			if err := kubearmor.Run(ctx, reportChan); err != nil {
-				slog.Error("kubearmor.Run exited with error", "error", err)
-				cancel()
-			}
-		}()
-	}
-	if withHubble {
-		go func() {
-			if err := hubble.Run(ctx, reportChan); err != nil {
-				slog.Error("hubble.Run exited with error", "error", err)
-				cancel()
-			}
-		}()
-	}
+	start(ctx, reportChan, cancel, "KubeArmor", env.KubeArmorServiceName, kubearmor.Run)
+	start(ctx, reportChan, cancel, "Hubble", env.HubbleServiceName, hubble.Run)
 
 	// Process reports from the channel
 	for {
@@ -130,5 +101,18 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 			slog.Info("Context done, exiting report processing loop.")
 			return
 		}
+	}
+}
+
+func start(ctx context.Context, reportChan chan *report.Item, cancel context.CancelFunc, name string, serviceVar string,
+	run func(ctx context.Context, reportChan chan *report.Item) error) {
+	if !env.Empty(serviceVar) {
+		go func() {
+			slog.Info("starting", "name", name, "service", os.Getenv(serviceVar))
+			if err := run(ctx, reportChan); err != nil {
+				slog.Error("run exited with error", "name", name, "error", err)
+				cancel()
+			}
+		}()
 	}
 }

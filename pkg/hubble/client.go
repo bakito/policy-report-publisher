@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bakito/policy-report-publisher/pkg/env"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/cilium/cilium/api/v1/flow"
 	observerpb "github.com/cilium/cilium/api/v1/observer"
@@ -22,10 +23,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const (
-	envServiceName = "HUBBLE_SERVICE"
-	envInsecure    = "HUBBLE_INSECURE"
-)
+const ()
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
 
@@ -51,10 +49,10 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 
 func newClient() (observerpb.ObserverClient, func() error, error) {
 	var gRPC string
-	if val, ok := os.LookupEnv(envServiceName); ok {
+	if val, ok := os.LookupEnv(env.HubbleServiceName); ok {
 		gRPC = val
 	} else {
-		return nil, nil, fmt.Errorf("hubble service name variable must %q be set", envServiceName)
+		return nil, nil, fmt.Errorf("hubble service name variable must %q be set", env.HubbleServiceName)
 	}
 
 	// read flows from a hubble server
@@ -73,7 +71,7 @@ func newClient() (observerpb.ObserverClient, func() error, error) {
 func newConn(target string) (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 
-	if i, ok := os.LookupEnv(envInsecure); ok && strings.EqualFold(i, "true") {
+	if env.Active(env.HubbleInsecure) {
 		creds = insecure.NewCredentials()
 	} else {
 		tlsConfig := tls.Config{

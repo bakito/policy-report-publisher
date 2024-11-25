@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"maps"
 
+	"github.com/bakito/policy-report-publisher/pkg/env"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
 	corev1 "k8s.io/api/core/v1"
@@ -22,7 +23,7 @@ import (
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
-func NewHandler(logReports bool) (Handler, error) {
+func NewHandler() (Handler, error) {
 	kc, dcl, cs, err := initKubeClient()
 	if err != nil {
 		return nil, err
@@ -31,7 +32,7 @@ func NewHandler(logReports bool) (Handler, error) {
 		client:     kc,
 		discovery:  dcl,
 		clientset:  cs,
-		logReports: logReports,
+		logReports: env.Active(env.LogReports),
 	}, nil
 }
 

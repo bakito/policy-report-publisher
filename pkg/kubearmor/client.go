@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bakito/policy-report-publisher/pkg/env"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	"github.com/kubearmor/kubearmor-client/log"
 	klog "github.com/kubearmor/kubearmor-client/log"
-)
-
-const (
-	envServiceName = "KUBEARMOR_SERVICE"
 )
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
@@ -55,7 +52,7 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 }
 
 func newLogClient(o klog.Options) (*klog.Feeder, error) {
-	if gRPC, ok := os.LookupEnv(envServiceName); ok {
+	if gRPC, ok := os.LookupEnv(env.KubeArmorServiceName); ok {
 		client, err := k8s.ConnectK8sClient()
 		if err != nil {
 			return nil, err
@@ -63,5 +60,5 @@ func newLogClient(o klog.Options) (*klog.Feeder, error) {
 		return log.NewClient(gRPC, o, client.K8sClientset)
 	}
 
-	return nil, fmt.Errorf("kubearmor service name variable must %q be set", envServiceName)
+	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.HubbleServiceName)
 }
