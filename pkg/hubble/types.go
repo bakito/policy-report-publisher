@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const reportSource = "Cilium Hubble"
+const reportSource = "Cilium Blocked Egress"
 
 func toItem(f *flow.Flow) *report.Item {
 	pr := prv1alpha2.PolicyReportResult{

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
+	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,18 +22,19 @@ import (
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
 func NewHandler(logReports bool) (Handler, error) {
-	kc, dcl, err := initKubeClient()
+	kc, dcl, cs, err := initKubeClient()
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
 		client:     kc,
 		discovery:  dcl,
+		clientset:  cs,
 		logReports: logReports,
 	}, nil
 }
 
-func initKubeClient() (client.Client, *discovery.DiscoveryClient, error) {
+func initKubeClient() (client.Client, *discovery.DiscoveryClient, clientset.Interface, error) {
 	scheme := runtime.NewScheme()
 	utilruntime.Must(prv1alpha2.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
@@ -42,15 +44,21 @@ func initKubeClient() (client.Client, *discovery.DiscoveryClient, error) {
 
 	config, err := rawKubeConfigLoader.ClientConfig()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	dcl, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
+
+	cs, err := clientset.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
 	cl, err := client.New(config, client.Options{Scheme: scheme})
-	return cl, dcl, err
+	return cl, dcl, cs, err
 }
 
 func (h *handler) PolicyReportAvailable() (bool, error) {

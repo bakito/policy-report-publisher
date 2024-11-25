@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/bakito/policy-report-publisher/pkg/hubble"
@@ -14,19 +15,25 @@ import (
 	"github.com/bakito/policy-report-publisher/version"
 )
 
+const envPodNamespace = "POD_NAMESPACE"
+
+var (
+	withHubble     bool
+	withKubeArmor  bool
+	logReports     bool
+	leaderElection bool
+)
+
 func init() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 }
 
 func main() {
-	var withHubble bool
-	var withKubeArmor bool
-	var logReports bool
-
 	flag.BoolVar(&withHubble, "hubble", false, "enable hubble")
 	flag.BoolVar(&withKubeArmor, "kubearmor", false, "enable kubearmor")
 	flag.BoolVar(&logReports, "log-reports", false, "if enabled, the reports are logged to std out")
+	flag.BoolVar(&leaderElection, "leader-election", false, "enable leader-election")
 	flag.Parse()
 
 	if !withKubeArmor && !withHubble {
@@ -62,6 +69,22 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	if leaderElection {
+		if ns, ok := os.LookupEnv(envPodNamespace); ok && strings.TrimSpace(ns) != "" {
+			if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {
+				slog.Error("error running with leader election", "error", err)
+				os.Exit(1)
+			}
+		} else {
+			slog.Error("pod namespace must be defined when leader election is enabled", "variable", envPodNamespace)
+			os.Exit(1)
+		}
+	} else {
+		run(ctx, handler, cancel)
+	}
+}
+
+func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc) {
 	// Create a channel for reports
 	reportChan := make(chan *report.Item, 100) // Buffered for performance
 
