@@ -94,12 +94,12 @@ func main() {
 	// Process reports from the channel
 	for {
 		select {
-		case report, ok := <-reportChan:
+		case rep, ok := <-reportChan:
 			if !ok {
 				// Channel closed, exit loop
 				return
 			}
-			if err := handler.Update(ctx, report); err != nil {
+			if err := handler.Update(ctx, rep); err != nil {
 				slog.Error("Failed to update report", "error", err)
 			}
 		case <-ctx.Done():

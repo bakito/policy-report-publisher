@@ -29,7 +29,7 @@ const (
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
 
-	client, cleanup, err := newClient(ctx)
+	client, cleanup, err := newClient()
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 	return getFlows(ctx, client, reportChan, req)
 }
 
-func newClient(ctx context.Context) (observerpb.ObserverClient, func() error, error) {
+func newClient() (observerpb.ObserverClient, func() error, error) {
 	var gRPC string
 	if val, ok := os.LookupEnv(envServiceName); ok {
 		gRPC = val
@@ -58,7 +58,7 @@ func newClient(ctx context.Context) (observerpb.ObserverClient, func() error, er
 	}
 
 	// read flows from a hubble server
-	hubbleConn, err := newConn(ctx, gRPC, 5*time.Second)
+	hubbleConn, err := newConn(gRPC)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -70,8 +70,7 @@ func newClient(ctx context.Context) (observerpb.ObserverClient, func() error, er
 }
 
 // New creates a new gRPC client connection to the target.
-func newConn(ctx context.Context, target string, _ time.Duration) (*grpc.ClientConn, error) {
-
+func newConn(target string) (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 
 	if i, ok := os.LookupEnv(envInsecure); ok && strings.EqualFold(i, "true") {

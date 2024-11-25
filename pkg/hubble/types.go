@@ -38,8 +38,12 @@ func toItem(f *flow.Flow) *report.Item {
 
 	if f.L4 != nil {
 		if f.L4.GetTCP() != nil {
-			for _, name := range f.DestinationNames {
-				pr.Properties[name] = fmt.Sprintf("%d", f.L4.GetTCP().DestinationPort)
+			if len(f.DestinationNames) == 0 && f.Destination != nil {
+				pr.Properties[f.Destination.Namespace+"/"+f.Destination.PodName] = fmt.Sprintf("%d", f.L4.GetTCP().DestinationPort)
+			} else {
+				for _, name := range f.DestinationNames {
+					pr.Properties[name] = fmt.Sprintf("%d", f.L4.GetTCP().DestinationPort)
+				}
 			}
 		} else if f.L4.GetICMPv4() != nil {
 			pr.Properties["ping "+f.IP.Destination] =
