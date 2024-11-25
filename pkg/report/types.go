@@ -15,21 +15,24 @@ type Handler interface {
 }
 
 type handler struct {
-	client    client.Client
-	discovery *discovery.DiscoveryClient
+	client     client.Client
+	discovery  *discovery.DiscoveryClient
+	logReports bool
 }
 
 type Item struct {
 	client.ObjectKey
 	result prv1alpha2.PolicyReportResult
+	source interface{}
 }
 
-func ItemFor(namespace string, name string, result prv1alpha2.PolicyReportResult) *Item {
+func ItemFor(namespace string, name string, result prv1alpha2.PolicyReportResult, source interface{}) *Item {
 	return &Item{
 		ObjectKey: types.NamespacedName{
 			Namespace: namespace,
 			Name:      name,
 		},
 		result: result,
+		source: source,
 	}
 }

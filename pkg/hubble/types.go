@@ -47,5 +47,5 @@ func toItem(f *flow.Flow) *report.Item {
 		}
 	}
 
-	return report.ItemFor(f.Source.Namespace, f.Source.PodName, pr)
+	return report.ItemFor(f.Source.Namespace, f.Source.PodName, pr, f)
 }

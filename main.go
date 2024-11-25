@@ -22,9 +22,11 @@ func init() {
 func main() {
 	var withHubble bool
 	var withKubeArmor bool
+	var logReports bool
 
 	flag.BoolVar(&withHubble, "hubble", false, "enable hubble")
 	flag.BoolVar(&withKubeArmor, "kubearmor", false, "enable kubearmor")
+	flag.BoolVar(&logReports, "log-reports", false, "if enabled, the reports are logged to std out")
 	flag.Parse()
 
 	if !withKubeArmor && !withHubble {
@@ -32,10 +34,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("policy-report-publisher", "version", version.Version, "hubble", withHubble, "kubearmor", withKubeArmor)
+	slog.Info("policy-report-publisher", "version", version.Version, "hubble", withHubble,
+		"kubearmor", withKubeArmor, "log-reports", logReports)
 
 	// Initialize the report handler
-	handler, err := report.NewHandler()
+	handler, err := report.NewHandler(logReports)
 	if err != nil {
 		slog.Error("failed to create report handler", "error", err)
 		os.Exit(1)

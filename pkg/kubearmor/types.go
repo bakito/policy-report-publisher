@@ -74,7 +74,7 @@ func (a Alert) toItem() *report.Item {
 			"Cwd":               a.Cwd,
 			"UpdatedTime":       a.UpdatedTime.Format(time.RFC3339),
 		},
-	})
+	}, &a)
 
 }
 

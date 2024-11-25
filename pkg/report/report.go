@@ -2,6 +2,7 @@ package report
 
 import (
 	"context"
+	"encoding/json"
 
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
@@ -19,14 +20,15 @@ import (
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
-func NewHandler() (Handler, error) {
-	client, dcl, err := initKubeClient()
+func NewHandler(logReports bool) (Handler, error) {
+	kc, dcl, err := initKubeClient()
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
-		client:    client,
-		discovery: dcl,
+		client:     kc,
+		discovery:  dcl,
+		logReports: logReports,
 	}, nil
 }
 
@@ -72,6 +74,12 @@ func (h *handler) PolicyReportAvailable() (bool, error) {
 func (h *handler) Update(ctx context.Context, report *Item) error {
 	if report.Name == "" {
 		return nil
+	}
+	if h.logReports {
+		b, err := json.Marshal(report.source)
+		if err == nil {
+			println(string(b))
+		}
 	}
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		pol, err := h.getPolicyReport(ctx, report)
