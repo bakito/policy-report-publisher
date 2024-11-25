@@ -3,6 +3,7 @@ package report
 import (
 	"context"
 	"encoding/json"
+	"maps"
 
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
@@ -145,6 +146,7 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 
 	for i, res := range pol.Results {
 		if res.Source == result.Source && res.Policy == result.Policy {
+			result.Properties = mergeProperties(pol.Results[i], result)
 			pol.Results[i] = result
 			found = true
 		}
@@ -154,4 +156,11 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 		pol.Results = append(pol.Results, result)
 	}
 	pol.Summary.Fail++
+}
+
+func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alpha2.PolicyReportResult) map[string]string {
+	oldProps := oldReport.Properties
+	newProps := newReport.Properties
+	maps.Copy(oldProps, newProps)
+	return oldProps
 }

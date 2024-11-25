@@ -5,13 +5,14 @@ WORKDIR /build
 ARG VERSION=main
 RUN apt-get update && apt-get install -y upx
 
-ENV GO111MODULE=on \
+ENV APP_NAME=policy-report-publisher \
+    GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux
 COPY . .
 
-RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/policy-report-publisher/version.Version=${VERSION}" -o policy-report-publisher && \
-    upx -q policy-report-publisher
+RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/policy-report-publisher/version.Version=${VERSION}" -o "${APP_NAME}" && \
+    upx -q "${APP_NAME}"
 
 # application image
 FROM scratch
