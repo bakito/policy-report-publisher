@@ -112,7 +112,7 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 	pod := &corev1.Pod{}
 	err := h.client.Get(ctx, report.ObjectKey, pod)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	podID := string(pod.GetUID())

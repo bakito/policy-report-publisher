@@ -13,11 +13,13 @@ import (
 	"github.com/bakito/policy-report-publisher/pkg/kubearmor"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/bakito/policy-report-publisher/version"
+	"k8s.io/klog/v2"
 )
 
 func init() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
+	klog.SetSlogLogger(logger)
 }
 
 func main() {

@@ -23,8 +23,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const ()
-
 func Run(ctx context.Context, reportChan chan *report.Item) error {
 
 	client, cleanup, err := newClient()
