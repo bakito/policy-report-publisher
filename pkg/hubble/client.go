@@ -111,7 +111,10 @@ func getFlows(ctx context.Context, client observerpb.ObserverClient, reportChan 
 		switch r := resp.GetResponseTypes().(type) {
 		case *observerpb.GetFlowsResponse_Flow:
 			if !ignoreFlow(r.Flow) {
-				reportChan <- toItem(r.Flow)
+				item := toItem(r.Flow)
+				if item != nil {
+					reportChan <- item
+				}
 			}
 		}
 	}

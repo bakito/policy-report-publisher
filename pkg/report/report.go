@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"maps"
+	"strconv"
 
 	"github.com/bakito/policy-report-publisher/pkg/env"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
@@ -20,6 +21,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
+
+const propCount = "count"
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
@@ -146,7 +149,7 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 	found := false
 
 	for i, res := range pol.Results {
-		if res.Source == result.Source && res.Policy == result.Policy {
+		if res.Source == result.Source && res.Policy == result.Policy && res.Rule == result.Rule {
 			result.Properties = mergeProperties(pol.Results[i], result)
 			pol.Results[i] = result
 			found = true
@@ -161,7 +164,13 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 
 func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alpha2.PolicyReportResult) map[string]string {
 	oldProps := oldReport.Properties
+	cnt, err := strconv.Atoi(oldProps[propCount])
+	if err != nil {
+		cnt = 0
+	}
+	cnt++
 	newProps := newReport.Properties
 	maps.Copy(oldProps, newProps)
+	oldProps[propCount] = strconv.Itoa(cnt)
 	return oldProps
 }
