@@ -47,6 +47,7 @@ type Alert struct {
 }
 
 func (a Alert) toItem() *report.Item {
+	ts := a.UpdatedTime.Format(time.RFC3339)
 	return report.ItemFor(a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
@@ -66,13 +67,14 @@ func (a Alert) toItem() *report.Item {
 			Nanos: a.Timestamp,
 		},
 		Properties: map[string]string{
-			"ProcessName":       a.ProcessName,
-			"ParentProcessName": a.ParentProcessName,
-			"Source":            a.Source,
-			"Operation":         a.Operation,
-			"Resource":          a.Resource,
-			"Cwd":               a.Cwd,
-			"UpdatedTime":       a.UpdatedTime.Format(time.RFC3339),
+			report.PropertyCreated: ts,
+			report.PropertyUpdated: ts,
+			"process-name":         a.ProcessName,
+			"parent-process-name":  a.ParentProcessName,
+			"source":               a.Source,
+			"operation":            a.Operation,
+			"resource":             a.Resource,
+			"cwd":                  a.Cwd,
 		},
 	}, &a)
 

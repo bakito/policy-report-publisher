@@ -23,7 +23,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-const propCount = "count"
+const (
+	propCount = "count"
+
+	PropertyCreated = "created"
+	PropertyUpdated = "updated"
+)
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
@@ -117,17 +122,17 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 	}
 
 	podID := string(pod.GetUID())
-	polID := fmt.Sprintf("prp-%s", podID)
+	policyID := fmt.Sprintf("prp-%s", podID)
 
 	pol := &prv1alpha2.PolicyReport{}
-	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: polID}, pol)
+	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
 
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &prv1alpha2.PolicyReport{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: report.Namespace,
-					Name:      podID,
+					Name:      policyID,
 				},
 			}
 
@@ -135,7 +140,7 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 			pol.Scope = &corev1.ObjectReference{
 				Namespace:  pod.Namespace,
 				Name:       pod.Name,
-				Kind:       pod.Kind,
+				Kind:       "Pod",
 				UID:        pod.GetUID(),
 				APIVersion: pod.APIVersion,
 			}
@@ -171,8 +176,14 @@ func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alph
 		cnt = 0
 	}
 	cnt++
+
+	created := oldProps[PropertyCreated]
+
 	newProps := newReport.Properties
 	maps.Copy(oldProps, newProps)
 	oldProps[propCount] = strconv.Itoa(cnt)
+	if created != "" {
+		oldProps[PropertyCreated] = created
+	}
 	return oldProps
 }
