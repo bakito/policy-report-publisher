@@ -3,6 +3,7 @@ package report
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"maps"
 	"strconv"
 
@@ -116,9 +117,10 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 	}
 
 	podID := string(pod.GetUID())
+	polID := fmt.Sprintf("prp-%s", podID)
 
 	pol := &prv1alpha2.PolicyReport{}
-	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: podID}, pol)
+	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: polID}, pol)
 
 	if err != nil {
 		if errors.IsNotFound(err) {
