@@ -8,9 +8,9 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/bakito/policy-report-publisher/pkg/adapter/hubble"
+	"github.com/bakito/policy-report-publisher/pkg/adapter/kubearmor"
 	"github.com/bakito/policy-report-publisher/pkg/env"
-	"github.com/bakito/policy-report-publisher/pkg/hubble"
-	"github.com/bakito/policy-report-publisher/pkg/kubearmor"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/bakito/policy-report-publisher/version"
 	"k8s.io/klog/v2"
