@@ -13,9 +13,9 @@ tidy:
 
 all: tidy rbac lint
 
-pf-hubble-443:
+pf-hubble:
 	kubectl port-forward -n kube-system svc/hubble-relay 32766:443
-pf-hubble-80:
+pf-hubble-insecure:
 	kubectl port-forward -n kube-system svc/hubble-relay 32766:80
 pf-kubearmor:
 	kubectl port-forward -n kubearmor svc/kubearmor 32767:32767
