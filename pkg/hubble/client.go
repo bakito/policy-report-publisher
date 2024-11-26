@@ -24,7 +24,6 @@ import (
 )
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
-
 	client, cleanup, err := newClient()
 	if err != nil {
 		return err
@@ -62,7 +61,6 @@ func newClient() (observerpb.ObserverClient, func() error, error) {
 	client := observerpb.NewObserverClient(hubbleConn)
 
 	return client, cleanup, err
-
 }
 
 // New creates a new gRPC client connection to the target.

@@ -21,9 +21,11 @@ var (
 	defaultRetryPeriod   = 2 * time.Second
 )
 
-func (h *handler) RunAsLeader(ctx context.Context, cancel context.CancelFunc, leaseLockNamespace string,
-	run func(ctx context.Context, handler Handler, cancel context.CancelFunc)) error {
+// +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete,namespace="{{.Release.Namespace}}"
 
+func (h *handler) RunAsLeader(ctx context.Context, cancel context.CancelFunc, leaseLockNamespace string,
+	run func(ctx context.Context, handler Handler, cancel context.CancelFunc),
+) error {
 	// Leader id, needs to be unique
 	id, err := os.Hostname()
 	if err != nil {

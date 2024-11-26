@@ -77,7 +77,6 @@ func (a Alert) toItem() *report.Item {
 			"cwd":                  a.Cwd,
 		},
 	}, &a)
-
 }
 
 func (a Alert) resultSeverity() prv1alpha2.PolicySeverity {
@@ -104,5 +103,4 @@ func (a Alert) resultSeverity() prv1alpha2.PolicySeverity {
 	default:
 		return "info"
 	}
-
 }

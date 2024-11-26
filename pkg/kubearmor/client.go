@@ -14,7 +14,6 @@ import (
 )
 
 func Run(ctx context.Context, reportChan chan *report.Item) error {
-
 	eventChan := make(chan klog.EventInfo)
 	o := log.Options{
 		EventChan: eventChan,

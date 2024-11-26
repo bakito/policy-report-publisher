@@ -21,5 +21,12 @@ jobs:
       with:
         go-version-file: "go.mod"
 
+    - name: Lint
+      run: make lint
+
+    - name: RBAC
+      run: make rbac
+
     - name: Build
       run: go build -v ./...
+

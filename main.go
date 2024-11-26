@@ -16,13 +16,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func init() {
+func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 	klog.SetSlogLogger(logger)
-}
-
-func main() {
 
 	if env.Empty(env.HubbleServiceName) && env.Empty(env.KubeArmorServiceName) {
 		slog.Error("either 'Hubble' or 'KubeArmor' must be enabled",
@@ -106,8 +103,13 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 	}
 }
 
-func start(ctx context.Context, reportChan chan *report.Item, cancel context.CancelFunc, name string, serviceVar string,
-	run func(ctx context.Context, reportChan chan *report.Item) error) {
+func start(ctx context.Context,
+	reportChan chan *report.Item,
+	cancel context.CancelFunc,
+	name string,
+	serviceVar string,
+	run func(ctx context.Context, reportChan chan *report.Item) error,
+) {
 	if !env.Empty(serviceVar) {
 		go func() {
 			slog.Info("starting", "name", name, "service", os.Getenv(serviceVar))
