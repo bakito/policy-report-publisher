@@ -32,6 +32,9 @@ const (
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
 
+// +kubebuilder:rbac:groups=,resources=pods,verbs=get;list;watch
+// +kubebuilder:rbac:groups=wgpolicyk8s.io,resources=policyreports,verbs=get;list;watch;create;update;patch
+
 func NewHandler() (Handler, error) {
 	kc, dcl, cs, err := initKubeClient()
 	if err != nil {
@@ -114,7 +117,6 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 }
 
 func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha2.PolicyReport, error) {
-
 	pod := &corev1.Pod{}
 	err := h.client.Get(ctx, report.ObjectKey, pod)
 	if err != nil {
@@ -126,7 +128,6 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha
 
 	pol := &prv1alpha2.PolicyReport{}
 	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
-
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &prv1alpha2.PolicyReport{
