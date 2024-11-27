@@ -103,8 +103,15 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 			println(string(b))
 		}
 	}
+
+	pod := &corev1.Pod{}
+	err := h.client.Get(ctx, report.ObjectKey, pod)
+	if err != nil {
+		return err
+	}
+
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
-		pol, err := h.getPolicyReport(ctx, report)
+		pol, err := h.getPolicyReport(ctx, report, pod)
 		if err != nil {
 			return err
 		}
@@ -116,18 +123,12 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 	})
 }
 
-func (h *handler) getPolicyReport(ctx context.Context, report *Item) (*prv1alpha2.PolicyReport, error) {
-	pod := &corev1.Pod{}
-	err := h.client.Get(ctx, report.ObjectKey, pod)
-	if err != nil {
-		return nil, err
-	}
-
+func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
 	podID := string(pod.GetUID())
 	policyID := fmt.Sprintf("prp-%s", podID)
 
 	pol := &prv1alpha2.PolicyReport{}
-	err = h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
+	err := h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &prv1alpha2.PolicyReport{
