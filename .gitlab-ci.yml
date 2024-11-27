@@ -15,6 +15,8 @@ test:
   extends: .golang
   script:
     - make lint
+  except:
+    - tags
 
 build-image:
   variables:
