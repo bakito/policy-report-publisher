@@ -2,18 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "datasourceTemplate": "go",
-      "description": "Update toolbox tools in .toolbox.mk",
-      "fileMatch": [
-        "^\\.toolbox\\.mk$"
-      ],
-      "matchStrings": [
-        "# renovate: packageName=(?<packageName>.+?)\\s+.+?_VERSION \\?= (?<currentValue>.+?)\\s"
-      ]
-    }
   ]
 }
