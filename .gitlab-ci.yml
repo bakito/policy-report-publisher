@@ -19,7 +19,7 @@ test:
 build-image:
   variables:
     DOCKER_IMAGE_TAG: repo.bison-group.com:5010/bison-operations/policy-report-publisher:develop-latest
-    DOCKER_BUILD_ARGS: --build-arg VERSION=develop-latest --build-arg BUILD=${CURRENT_BUILD_TIME}
+    DOCKER_BUILD_ARGS: --build-arg VERSION=develop-latest --build-arg BUILD=${CURRENT_BUILD_TIME} --no-push
   stage: publish
   extends: .build-image
   needs:
