@@ -48,7 +48,7 @@ type Alert struct {
 
 func (a Alert) toItem() *report.Item {
 	ts := a.UpdatedTime.Format(time.RFC3339)
-	return report.ItemFor(a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
+	return report.ItemFor("kubearmor", a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
 

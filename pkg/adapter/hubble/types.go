@@ -56,7 +56,7 @@ func toItem(f *flow.Flow) *report.Item {
 
 	addPodLabels(f, pr)
 
-	return report.ItemFor(f.Source.Namespace, f.Source.PodName, pr, f)
+	return report.ItemFor("clilum-blocked-egress", f.Source.Namespace, f.Source.PodName, pr, f)
 }
 
 func addPodLabels(f *flow.Flow, pr prv1alpha2.PolicyReportResult) {

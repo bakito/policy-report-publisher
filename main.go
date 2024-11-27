@@ -11,6 +11,7 @@ import (
 	"github.com/bakito/policy-report-publisher/pkg/adapter/hubble"
 	"github.com/bakito/policy-report-publisher/pkg/adapter/kubearmor"
 	"github.com/bakito/policy-report-publisher/pkg/env"
+	"github.com/bakito/policy-report-publisher/pkg/metrics"
 	"github.com/bakito/policy-report-publisher/pkg/report"
 	"github.com/bakito/policy-report-publisher/version"
 	"k8s.io/klog/v2"
@@ -57,6 +58,8 @@ func main() {
 	// Create a cancellable context for graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	go metrics.Start(ctx)
 
 	if ns, ok := os.LookupEnv(env.LeaderElectionNS); ok && strings.TrimSpace(ns) != "" {
 		if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {

@@ -5,6 +5,7 @@ import (
 
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -21,16 +22,19 @@ type handler struct {
 	discovery  *discovery.DiscoveryClient
 	logReports bool
 	clientset  clientset.Interface
+	counter    *prometheus.CounterVec
 }
 
 type Item struct {
 	client.ObjectKey
-	result prv1alpha2.PolicyReportResult
-	source interface{}
+	handlerID string
+	result    prv1alpha2.PolicyReportResult
+	source    interface{}
 }
 
-func ItemFor(namespace string, name string, result prv1alpha2.PolicyReportResult, source interface{}) *Item {
+func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source interface{}) *Item {
 	return &Item{
+		handlerID: handlerID,
 		ObjectKey: types.NamespacedName{
 			Namespace: namespace,
 			Name:      name,

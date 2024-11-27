@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"maps"
 	"strconv"
+	"strings"
 
 	"github.com/bakito/policy-report-publisher/pkg/env"
+	"github.com/bakito/policy-report-publisher/version"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
+	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,11 +43,24 @@ func NewHandler() (Handler, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	counter := prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name:      "processed_items",
+			Namespace: strings.ReplaceAll(version.Name, "-", "_"),
+			Help:      "The number of processed items by adapter",
+		},
+		[]string{"adapter"},
+	)
+
+	prometheus.MustRegister(counter)
+
 	return &handler{
 		client:     kc,
 		discovery:  dcl,
 		clientset:  cs,
 		logReports: env.Active(env.LogReports),
+		counter:    counter,
 	}, nil
 }
 
@@ -109,6 +125,8 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 	if err != nil {
 		return err
 	}
+
+	h.counter.WithLabelValues(report.handlerID).Inc()
 
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		pol, err := h.getPolicyReport(ctx, report, pod)
