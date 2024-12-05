@@ -8,7 +8,7 @@ require (
 	github.com/kubearmor/kubearmor-client v1.2.3
 	github.com/kyverno/kyverno v1.13.1
 	github.com/prometheus/client_golang v1.20.5
-	google.golang.org/grpc v1.68.0
+	google.golang.org/grpc v1.68.1
 	k8s.io/api v0.31.3
 	k8s.io/apimachinery v0.31.3
 	k8s.io/cli-runtime v0.31.3
