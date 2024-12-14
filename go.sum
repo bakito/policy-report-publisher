@@ -528,6 +528,8 @@ github.com/kubearmor/KubeArmor/protobuf v0.0.0-20241125103638-a86f306f1022 h1:mO
 github.com/kubearmor/KubeArmor/protobuf v0.0.0-20241125103638-a86f306f1022/go.mod h1:l45QUeImWkcfDmD5EnkOcClOdSjgYsrogJYtd+kZW44=
 github.com/kubearmor/kubearmor-client v1.2.3 h1:vFSE1uJ95pjgPFDC11K/fa83w86wM4hpUtD1nwEbAiE=
 github.com/kubearmor/kubearmor-client v1.2.3/go.mod h1:8zVe/pelbL+FDOETND+JD+LPGqLldOSwT0nBZzvOkQw=
+github.com/kubearmor/kubearmor-client v1.3.0 h1:pWtHll6pfvszKo9bLpFVKn96o0rZS2EGpdYOqtGkpp4=
+github.com/kubearmor/kubearmor-client v1.3.0/go.mod h1:Pti3ZLFoDnoy+ipwyk6pkaiScW4fCnaMwOwh/VyYMqY=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877 h1:XOLJNGX/q6MVpI8p8MKvk6jGBMvO4CrdwrizMMSsaRU=
