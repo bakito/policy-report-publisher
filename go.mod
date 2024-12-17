@@ -3,7 +3,7 @@ module github.com/bakito/policy-report-publisher
 go 1.23.3
 
 require (
-	github.com/cilium/cilium v1.16.4
+	github.com/cilium/cilium v1.16.5
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0
 	github.com/kubearmor/kubearmor-client v1.3.0
 	github.com/kyverno/kyverno v1.13.2
@@ -276,8 +276,8 @@ require (
 	golang.org/x/time v0.8.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/api v0.209.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241206012308-a4fef0638583 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241206012308-a4fef0638583 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
