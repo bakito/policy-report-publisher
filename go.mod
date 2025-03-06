@@ -7,7 +7,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0
 	github.com/kubearmor/kubearmor-client v1.3.0
 	github.com/kyverno/kyverno v1.13.4
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	google.golang.org/grpc v1.71.0
 	k8s.io/api v0.31.4
 	k8s.io/apimachinery v0.31.4
