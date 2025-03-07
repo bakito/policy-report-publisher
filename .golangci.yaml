@@ -28,16 +28,16 @@ linters:
     - nolintlint
     - nosprintfhostport
     - paralleltest
+    - prealloc
     - staticcheck
-    - tenv
     - thelper
     - tparallel
     - typecheck
     - unconvert
     - unused
+    - usetesting
     - wastedassign
     - whitespace
-    - prealloc
 
 run:
   timeout: 15m

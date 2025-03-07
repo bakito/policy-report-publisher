@@ -14,9 +14,9 @@ TB_GOLANGCI_LINT ?= $(TB_LOCALBIN)/golangci-lint
 
 ## Tool Versions
 # renovate: packageName=sigs.k8s.io/controller-tools/cmd/controller-gen
-TB_CONTROLLER_GEN_VERSION ?= v0.16.5
+TB_CONTROLLER_GEN_VERSION ?= v0.17.2
 # renovate: packageName=github.com/golangci/golangci-lint/cmd/golangci-lint
-TB_GOLANGCI_LINT_VERSION ?= v1.62.2
+TB_GOLANGCI_LINT_VERSION ?= v1.64.6
 
 ## Tool Installer
 .PHONY: tb.controller-gen
