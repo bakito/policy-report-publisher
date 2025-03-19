@@ -514,8 +514,8 @@ github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20250312062449-d45
 github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20250312062449-d451e9611455/go.mod h1:BUJdEgbleyC2BvbqUNJ4fhJQom3R9gfHGoLBjeQ75rI=
 github.com/kubearmor/KubeArmor/protobuf v0.0.0-20250312062449-d451e9611455 h1:Ka3n8XPTHGMHsytTTHMOn59HP1AEUJx08dc2tekjVvw=
 github.com/kubearmor/KubeArmor/protobuf v0.0.0-20250312062449-d451e9611455/go.mod h1:5uEGDcmXwDakbkTEBnQ2hz2qEkr6sIlqU3GI5hVhEIM=
-github.com/kubearmor/kubearmor-client v1.3.3 h1:ffOF0HlghOg+kj1w98p+dF3lzvL10o8lii9gTWYaU1c=
-github.com/kubearmor/kubearmor-client v1.3.3/go.mod h1:3SZHIypi0RFf+Sb5VO2y0dBqEp4NJA/veoHPFg6b35Q=
+github.com/kubearmor/kubearmor-client v1.3.4 h1:MGN51/tlfsojU+e0W4IpvdfjcWhTdX43QqrqZ564OwU=
+github.com/kubearmor/kubearmor-client v1.3.4/go.mod h1:3SZHIypi0RFf+Sb5VO2y0dBqEp4NJA/veoHPFg6b35Q=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877 h1:XOLJNGX/q6MVpI8p8MKvk6jGBMvO4CrdwrizMMSsaRU=
