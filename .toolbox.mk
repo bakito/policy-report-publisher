@@ -15,8 +15,8 @@ TB_GOLANGCI_LINT ?= $(TB_LOCALBIN)/golangci-lint
 ## Tool Versions
 # renovate: packageName=sigs.k8s.io/controller-tools/cmd/controller-gen
 TB_CONTROLLER_GEN_VERSION ?= v0.17.2
-# renovate: packageName=github.com/golangci/golangci-lint/cmd/golangci-lint
-TB_GOLANGCI_LINT_VERSION ?= v1.64.8
+# renovate: packageName=github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+TB_GOLANGCI_LINT_VERSION ?= v2.0.2
 
 ## Tool Installer
 .PHONY: tb.controller-gen
@@ -26,7 +26,7 @@ $(TB_CONTROLLER_GEN): $(TB_LOCALBIN)
 .PHONY: tb.golangci-lint
 tb.golangci-lint: $(TB_GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
 $(TB_GOLANGCI_LINT): $(TB_LOCALBIN)
-	test -s $(TB_LOCALBIN)/golangci-lint || GOBIN=$(TB_LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(TB_GOLANGCI_LINT_VERSION)
+	test -s $(TB_LOCALBIN)/golangci-lint || GOBIN=$(TB_LOCALBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(TB_GOLANGCI_LINT_VERSION)
 
 ## Reset Tools
 .PHONY: tb.reset
@@ -40,5 +40,5 @@ tb.reset:
 tb.update: tb.reset
 	toolbox makefile --renovate -f $(TB_LOCALDIR)/Makefile \
 		sigs.k8s.io/controller-tools/cmd/controller-gen@github.com/kubernetes-sigs/controller-tools \
-		github.com/golangci/golangci-lint/cmd/golangci-lint
+		github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 ## toolbox - end
