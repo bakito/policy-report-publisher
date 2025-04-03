@@ -1,11 +1,12 @@
 module github.com/bakito/policy-report-publisher
 
 go 1.24.1
+
 require (
 	github.com/cilium/cilium v1.17.2
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/kubearmor/kubearmor-client v1.3.4
-	github.com/kyverno/kyverno v1.14.0-alpha.1
+	github.com/kyverno/kyverno v1.14.0-rc.1
 	github.com/prometheus/client_golang v1.21.1
 	google.golang.org/grpc v1.71.0
 	k8s.io/api v0.32.3
@@ -21,7 +22,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20241125120445-2c00c104c6e1 // indirect
-	cuelang.org/go v0.11.1 // indirect
+	cuelang.org/go v0.12.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/provider v0.15.2 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
@@ -74,10 +75,10 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/buildkite/agent/v3 v3.90.0 // indirect
+	github.com/buildkite/agent/v3 v3.92.1 // indirect
 	github.com/buildkite/go-pipeline v0.13.3 // indirect
 	github.com/buildkite/interpolate v0.1.5 // indirect
-	github.com/buildkite/roko v1.3.0 // indirect
+	github.com/buildkite/roko v1.3.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20230304212654-82a0ddb27589 // indirect
@@ -132,7 +133,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/certificate-transparency-go v1.3.0 // indirect
+	github.com/google/certificate-transparency-go v1.3.1 // indirect
 	github.com/google/gnostic-models v0.6.9 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-containerregistry v0.20.3 // indirect
@@ -185,7 +186,7 @@ require (
 	github.com/oleiade/reflections v1.1.0 // indirect
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852 // indirect
 	github.com/open-policy-agent/gatekeeper/v3 v3.17.1 // indirect
-	github.com/open-policy-agent/opa v0.70.0 // indirect
+	github.com/open-policy-agent/opa v1.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
@@ -208,13 +209,13 @@ require (
 	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/sigstore/cosign/v2 v2.4.1 // indirect
-	github.com/sigstore/fulcio v1.6.5 // indirect
+	github.com/sigstore/fulcio v1.6.6 // indirect
 	github.com/sigstore/k8s-manifest-sigstore v0.5.4 // indirect
 	github.com/sigstore/protobuf-specs v0.4.0 // indirect
 	github.com/sigstore/rekor v1.3.9 // indirect
 	github.com/sigstore/sigstore v1.9.1 // indirect
 	github.com/sigstore/sigstore-go v0.6.2 // indirect
-	github.com/sigstore/timestamp-authority v1.2.3 // indirect
+	github.com/sigstore/timestamp-authority v1.2.4 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
@@ -223,10 +224,10 @@ require (
 	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.20.0 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.4.0 // indirect
+	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
-	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
+	github.com/tchap/go-patricia/v2 v2.3.2 // indirect
 	github.com/tektoncd/chains v0.23.0 // indirect
 	github.com/thales-e-security/pool v0.0.2 // indirect
 	github.com/theupdateframework/go-tuf v0.7.0 // indirect
@@ -281,10 +282,10 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.32.3 // indirect
 	k8s.io/component-base v0.32.3 // indirect
-	k8s.io/kube-openapi v0.0.0-20250304201544-e5f78fe3ede9 // indirect
+	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff // indirect
 	k8s.io/kubectl v0.32.3 // indirect
 	k8s.io/pod-security-admission v0.32.3 // indirect
-	k8s.io/utils v0.0.0-20241210054802-24370beab758 // indirect
+	k8s.io/utils v0.0.0-20250321185631-1f6e0b77f77e // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/kustomize/api v0.19.0 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.19.0 // indirect
