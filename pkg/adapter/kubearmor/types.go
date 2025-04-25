@@ -47,7 +47,6 @@ type Alert struct {
 }
 
 func (a Alert) toItem() *report.Item {
-	ts := a.UpdatedTime.Format(time.RFC3339)
 	return report.ItemFor("kubearmor", a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
@@ -67,8 +66,8 @@ func (a Alert) toItem() *report.Item {
 			Nanos: a.Timestamp,
 		},
 		Properties: map[string]string{
-			report.PropertyCreated: ts,
-			report.PropertyUpdated: ts,
+			report.PropertyCreated: a.UpdatedTimeRFC3339(),
+			report.PropertyUpdated: a.UpdatedTimeRFC3339(),
 			"process-name":         a.ProcessName,
 			"parent-process-name":  a.ParentProcessName,
 			"source":               a.Source,
@@ -103,4 +102,8 @@ func (a Alert) resultSeverity() prv1alpha2.PolicySeverity {
 	default:
 		return "info"
 	}
+}
+
+func (a Alert) UpdatedTimeRFC3339() string {
+	return a.UpdatedTime.Format(time.RFC3339)
 }
