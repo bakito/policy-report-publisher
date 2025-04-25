@@ -26,8 +26,6 @@ func toItem(f *flow.Flow) *report.Item {
 		return nil
 	}
 
-	ts := f.GetTime().AsTime().Format(time.RFC3339)
-
 	pr := prv1alpha2.PolicyReportResult{
 		Category: f.TrafficDirection.String(),
 		Message:  f.DropReasonDesc.String(),
@@ -48,8 +46,8 @@ func toItem(f *flow.Flow) *report.Item {
 			Nanos: f.Time.GetNanos(),
 		},
 		Properties: map[string]string{
-			report.PropertyCreated: ts,
-			report.PropertyUpdated: ts,
+			report.PropertyCreated: updatedTimeRFC3339(f),
+			report.PropertyUpdated: updatedTimeRFC3339(f),
 			"protocol":             protocol,
 		},
 	}
@@ -86,4 +84,8 @@ func destination(f *flow.Flow) (string, string) {
 		}
 	}
 	return "", ""
+}
+
+func updatedTimeRFC3339(f *flow.Flow) string {
+	return f.GetTime().AsTime().Format(time.RFC3339)
 }
