@@ -3,7 +3,7 @@ module github.com/bakito/policy-report-publisher
 go 1.24.2
 
 require (
-	github.com/cilium/cilium v1.17.3
+	github.com/cilium/cilium v1.17.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/kubearmor/kubearmor-client v1.3.4
 	github.com/kyverno/kyverno v1.14.1
