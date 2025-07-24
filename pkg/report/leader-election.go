@@ -74,7 +74,7 @@ func (h *handler) RunAsLeader(ctx context.Context, cancel context.CancelFunc, le
 				// when the LeaderElector exits, even if it did not start leading.
 				// Therefore, we should check if we actually started leading before
 				// performing any cleanup operations to avoid unexpected behavior.
-				slog.Info("leader lost", "identity", id)
+				slog.InfoContext(ctx, "leader lost", "identity", id)
 
 				os.Exit(0)
 			},
@@ -85,7 +85,7 @@ func (h *handler) RunAsLeader(ctx context.Context, cancel context.CancelFunc, le
 					// I just got the lock
 					return
 				}
-				slog.Info("new leader elected", "identity", identity)
+				slog.InfoContext(ctx, "new leader elected", "identity", identity)
 			},
 		},
 	})

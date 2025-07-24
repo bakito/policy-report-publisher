@@ -6,16 +6,16 @@ TB_LOCALDIR ?= $(shell which cygpath > /dev/null 2>&1 && cygpath -m $$(pwd) || p
 ## Location to install dependencies to
 TB_LOCALBIN ?= $(TB_LOCALDIR)/bin
 $(TB_LOCALBIN):
-	mkdir -p $(TB_LOCALBIN)
+	if [ ! -e $(TB_LOCALBIN) ]; then mkdir -p $(TB_LOCALBIN); fi
 
 ## Tool Binaries
 TB_CONTROLLER_GEN ?= $(TB_LOCALBIN)/controller-gen
 TB_GOLANGCI_LINT ?= $(TB_LOCALBIN)/golangci-lint
 
 ## Tool Versions
-# renovate: packageName=sigs.k8s.io/controller-tools/cmd/controller-gen
+# renovate: packageName=github.com/kubernetes-sigs/controller-tools
 TB_CONTROLLER_GEN_VERSION ?= v0.18.0
-# renovate: packageName=github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+# renovate: packageName=github.com/golangci/golangci-lint/v2
 TB_GOLANGCI_LINT_VERSION ?= v2.3.0
 
 ## Tool Installer
