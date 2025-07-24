@@ -18,18 +18,19 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 	klog.SetSlogLogger(logger)
 
 	if env.Empty(env.HubbleServiceName) && env.Empty(env.KubeArmorServiceName) {
-		slog.Error("either 'Hubble' or 'KubeArmor' must be enabled",
+		slog.ErrorContext(ctx, "either 'Hubble' or 'KubeArmor' must be enabled",
 			"hubble", env.HubbleServiceName,
 			"kubearmor", env.KubeArmorServiceName)
 		os.Exit(1)
 	}
 
-	slog.Info("policy-report-publisher", "version", version.Version,
+	slog.InfoContext(ctx, "policy-report-publisher", "version", version.Version,
 		"hubble", os.Getenv(env.HubbleServiceName),
 		"kubearmor", os.Getenv(env.KubeArmorServiceName),
 		"log-reports", env.Active(env.LogReports))
@@ -37,18 +38,18 @@ func main() {
 	// Initialize the report handler
 	handler, err := report.NewHandler()
 	if err != nil {
-		slog.Error("failed to create report handler", "error", err)
+		slog.ErrorContext(ctx, "failed to create report handler", "error", err)
 		os.Exit(1)
 	}
 
 	ok, err := handler.PolicyReportAvailable()
 	if err != nil {
-		slog.Error("could not check if PolicyReport is available", "error", err)
+		slog.ErrorContext(ctx, "could not check if PolicyReport is available", "error", err)
 		os.Exit(1)
 	}
 	// https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/25056e1f3eb5cab1e693b8c880eb693a84e099af/policy-report/crd/v1beta2/wgpolicyk8s.io_policyreports.yaml
 	if !ok {
-		slog.Error("PolicyReport CRD is not available, please install kyverno",
+		slog.ErrorContext(ctx, "PolicyReport CRD is not available, please install kyverno",
 			"APIVersion", report.PolicyReport.APIVersion,
 			"Kind", report.PolicyReport.Kind,
 		)
@@ -63,7 +64,7 @@ func main() {
 
 	if ns, ok := os.LookupEnv(env.LeaderElectionNS); ok && strings.TrimSpace(ns) != "" {
 		if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {
-			slog.Error("error running with leader election", "error", err)
+			slog.ErrorContext(ctx, "error running with leader election", "error", err)
 			os.Exit(1)
 		}
 	} else {
@@ -80,7 +81,7 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		slog.Info("Shutting down gracefully...")
+		slog.InfoContext(ctx, "Shutting down gracefully...")
 		cancel()
 	}()
 
@@ -96,11 +97,11 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 				return
 			}
 			if err := handler.Update(ctx, rep); err != nil {
-				slog.Error("Failed to update report", "error", err)
+				slog.ErrorContext(ctx, "Failed to update report", "error", err)
 			}
 		case <-ctx.Done():
 			// Context is done, exit loop
-			slog.Info("Context done, exiting report processing loop.")
+			slog.InfoContext(ctx, "Context done, exiting report processing loop.")
 			return
 		}
 	}
@@ -115,9 +116,9 @@ func start(ctx context.Context,
 ) {
 	if !env.Empty(serviceVar) {
 		go func() {
-			slog.Info("starting", "name", name, "service", os.Getenv(serviceVar))
+			slog.InfoContext(ctx, "starting", "name", name, "service", os.Getenv(serviceVar))
 			if err := run(ctx, reportChan); err != nil {
-				slog.Error("run exited with error", "name", name, "error", err)
+				slog.ErrorContext(ctx, "run exited with error", "name", name, "error", err)
 				cancel()
 			}
 		}()

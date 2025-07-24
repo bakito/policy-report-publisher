@@ -16,7 +16,7 @@ func Start(ctx context.Context) {
 		_, _ = fmt.Fprintln(w, "OK")
 	})
 
-	slog.Info("starting metrics", "port", "8080")
+	slog.InfoContext(ctx, "starting metrics", "port", "8080")
 
 	server := &http.Server{
 		Addr:              ":8080",
