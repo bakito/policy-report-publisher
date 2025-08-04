@@ -16,7 +16,7 @@ TB_GOLANGCI_LINT ?= $(TB_LOCALBIN)/golangci-lint
 # renovate: packageName=github.com/kubernetes-sigs/controller-tools
 TB_CONTROLLER_GEN_VERSION ?= v0.18.0
 # renovate: packageName=github.com/golangci/golangci-lint/v2
-TB_GOLANGCI_LINT_VERSION ?= v2.3.0
+TB_GOLANGCI_LINT_VERSION ?= v2.3.1
 
 ## Tool Installer
 .PHONY: tb.controller-gen
