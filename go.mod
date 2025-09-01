@@ -9,10 +9,10 @@ require (
 	github.com/kyverno/kyverno v1.14.4
 	github.com/prometheus/client_golang v1.23.0
 	google.golang.org/grpc v1.75.0
-	k8s.io/api v0.32.3
-	k8s.io/apimachinery v0.32.3
-	k8s.io/cli-runtime v0.32.3
-	k8s.io/client-go v0.32.3
+	k8s.io/api v0.34.0
+	k8s.io/apimachinery v0.34.0
+	k8s.io/cli-runtime v0.34.0
+	k8s.io/client-go v0.34.0
 	k8s.io/klog/v2 v2.130.1
 	sigs.k8s.io/controller-runtime v0.20.4
 )
