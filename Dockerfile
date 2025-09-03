@@ -1,4 +1,4 @@
-FROM golang:1.24-bullseye AS builder
+FROM golang:1.25-alpine3.22 AS builder
 
 WORKDIR /build
 
@@ -11,10 +11,11 @@ ENV APP_NAME=policy-report-publisher \
 
 COPY . /go/src/app/
 
-# hadolint ignore=DL3008
-RUN curl --insecure https://repo.bison-group.com/ops.staging/caCerts/bisonca.v2.cer >> /etc/ssl/certs/ca-certificates.crt && \
-    sed -i 's#http://deb.debian.org#https://repo.bison-group.com/artifactory/deb.debian.org#' /etc/apt/sources.list && \
-    apt-get update && apt-get install --no-install-recommends -y upx
+# hadolint ignore=DL3018
+RUN wget -q --no-check-certificate --output-document=/etc/ssl/certs/ca-certificates.crt https://repo.bison-group.com/ops.staging/caCerts/bisonca.v2.cer && \
+    sed -i 's|https://dl-cdn.alpinelinux.org/alpine|https://repo.bison-group.com/artifactory/alpinelinux.org|g' /etc/apk/repositories && \
+    apk update && apk add --no-cache upx
+
 
 COPY . .
 

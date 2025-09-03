@@ -36,8 +36,6 @@ build-image-tag:
     DOCKER_PUSH_ALWAYS: 'true'
   stage: publish
   extends: .build-image
-  needs:
-    - test
   only:
     - tags
   except:
