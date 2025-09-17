@@ -66,7 +66,7 @@ func (s *ingestServer) PushItems(ctx context.Context, req *IngestItems) (*Ack, e
 				src = m
 			} else {
 				// fallback: store as raw json string
-				src = json.RawMessage(wi.Source)
+				src = wi.Source
 			}
 		}
 		it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
@@ -109,7 +109,7 @@ func (s *ingestServer) StreamItems(stream grpc.ServerStream) error {
 				if err := json.Unmarshal(wi.Source, &m); err == nil {
 					src = m
 				} else {
-					src = json.RawMessage(wi.Source)
+					src = wi.Source
 				}
 			}
 			it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)

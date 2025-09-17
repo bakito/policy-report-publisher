@@ -53,12 +53,11 @@ func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*r
 				Source:    raw,
 			})
 		}
-		var req = &IngestItems{Items: wire}
+		req := &IngestItems{Items: wire}
 		var resp Ack
 		return conn.Invoke(ctx, "/policyreport.publisher.v1.IngestService/PushItems", req, &resp)
 	}
 	return invoke, conn.Close, nil
-
 }
 
 // PushChannel creates a channel that automatically batches items and pushes them
