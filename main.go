@@ -8,11 +8,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/bakito/policy-report-publisher/pkg/adapter/hubble"
-	"github.com/bakito/policy-report-publisher/pkg/adapter/kubearmor"
-	"github.com/bakito/policy-report-publisher/pkg/env"
-	"github.com/bakito/policy-report-publisher/pkg/metrics"
-	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/internal/adapter/hubble"
+	"github.com/bakito/policy-report-publisher/internal/adapter/kubearmor"
+	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher/internal/metrics"
+	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/bakito/policy-report-publisher/version"
 	"k8s.io/klog/v2"
 )

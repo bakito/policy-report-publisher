@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/cilium/cilium/api/v1/flow"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

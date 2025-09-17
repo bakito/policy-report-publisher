@@ -2,7 +2,7 @@
 include ./.toolbox.mk
 
 rbac: tb.controller-gen ## Generate RBAC resources
-	$(TB_CONTROLLER_GEN) crd rbac:roleName=policy-report-publisher paths="./pkg/..." output:crd:artifacts:config=config/crd/bases
+	$(TB_CONTROLLER_GEN) crd rbac:roleName=policy-report-publisher paths="./internal/..." output:crd:artifacts:config=config/crd/bases
 
 lint: tb.golangci-lint
 	$(TB_GOLANGCI_LINT) run --fix

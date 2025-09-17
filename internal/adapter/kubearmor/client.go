@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bakito/policy-report-publisher/pkg/env"
-	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	klog "github.com/kubearmor/kubearmor-client/log"
 )
