@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bakito/policy-report-publisher/pkg/env"
-	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/cilium/cilium/api/v1/flow"
 	observerpb "github.com/cilium/cilium/api/v1/observer"
 	"github.com/cilium/cilium/hubble/pkg/defaults"

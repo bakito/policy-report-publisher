@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bakito/policy-report-publisher/pkg/env"
+	"github.com/bakito/policy-report-publisher/internal/env"
 	"github.com/bakito/policy-report-publisher/version"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
@@ -66,7 +66,7 @@ func NewHandler() (Handler, error) {
 
 func initKubeClient() (client.Client, *discovery.DiscoveryClient, clientset.Interface, error) {
 	scheme := runtime.NewScheme()
-	utilruntime.Must(prv1alpha2.AddToScheme(scheme))
+	utilruntime.Must(prv1alpha2.Install(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
 
 	restClientGetter := genericclioptions.ConfigFlags{}

@@ -29,10 +29,10 @@ type Item struct {
 	client.ObjectKey
 	handlerID string
 	result    prv1alpha2.PolicyReportResult
-	source    interface{}
+	source    any
 }
 
-func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source interface{}) *Item {
+func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source any) *Item {
 	return &Item{
 		handlerID: handlerID,
 		ObjectKey: types.NamespacedName{

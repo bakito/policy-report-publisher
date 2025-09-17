@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bakito/policy-report-publisher/pkg/env"
-	"github.com/bakito/policy-report-publisher/pkg/report"
+	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	klog "github.com/kubearmor/kubearmor-client/log"
 )
@@ -58,5 +58,5 @@ func newLogClient(o klog.Options) (*klog.Feeder, error) {
 		return klog.NewClient(gRPC, o, client.K8sClientset)
 	}
 
-	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.HubbleServiceName)
+	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.KubeArmorServiceName)
 }
