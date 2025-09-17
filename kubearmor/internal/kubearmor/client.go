@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bakito/policy-report-publisher/pkg/adapter"
 	"github.com/bakito/policy-report-publisher/pkg/api"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	klog "github.com/kubearmor/kubearmor-client/log"
@@ -13,7 +14,13 @@ import (
 
 const kubeArmorServiceName = "KUBE_ARMOR_SERVICE"
 
-func Run(ctx context.Context, reportChan chan *api.Item) error {
+type kubearmor struct{}
+
+func New() adapter.Adapter {
+	return &kubearmor{}
+}
+
+func (*kubearmor) Run(ctx context.Context, reportChan chan *api.Item) error {
 	eventChan := make(chan klog.EventInfo)
 	o := klog.Options{
 		EventChan: eventChan,

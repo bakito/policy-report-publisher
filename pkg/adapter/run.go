@@ -7,7 +7,9 @@ import (
 	"github.com/bakito/policy-report-publisher/pkg/api"
 )
 
-type Adapter func(context.Context, chan *api.Item) error
+type Adapter interface {
+	Run(context.Context, chan *api.Item) error
+}
 
 func Start(ctx context.Context, adapter Adapter, publisherAddr string) error {
 	if publisherAddr == "" {
@@ -39,5 +41,5 @@ func Start(ctx context.Context, adapter Adapter, publisherAddr string) error {
 		}
 	}()
 
-	return adapter(ctx, adapterCh)
+	return adapter.Run(ctx, adapterCh)
 }

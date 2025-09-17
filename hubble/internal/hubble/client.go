@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bakito/policy-report-publisher/pkg/adapter"
 	"github.com/bakito/policy-report-publisher/pkg/api"
 	"github.com/bakito/policy-report-publisher/pkg/env"
 	"github.com/cilium/cilium/api/v1/flow"
@@ -28,7 +29,13 @@ const (
 	hubbleInsecure    = "HUBBLE_INSECURE"
 )
 
-func Run(ctx context.Context, reportChan chan *api.Item) error {
+type hubble struct{}
+
+func New() adapter.Adapter {
+	return &hubble{}
+}
+
+func (*hubble) Run(ctx context.Context, reportChan chan *api.Item) error {
 	client, cleanup, err := newClient()
 	if err != nil {
 		return err

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	if err := adapter.Start(context.Background(), hubble.Run, os.Getenv("PUBLISHER_GRPC_ADDR")); err != nil {
+	if err := adapter.Start(context.Background(), hubble.New(), os.Getenv("PUBLISHER_GRPC_ADDR")); err != nil {
 		slog.Error("failed to start report handler", "error", err)
 	}
 }
