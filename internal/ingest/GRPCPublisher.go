@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -19,8 +19,8 @@ import (
 //
 //	pub, close, _ := ingest.NewGRPCPublisher(ctx, "127.0.0.1:9090")
 //	defer close()
-//	_ = pub([]*report.Item{ item1, item2 })
-func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*report.Item) error, close func() error, err error) {
+//	_ = pub([]*api.Item{ item1, item2 })
+func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*api.Item) error, close func() error, err error) {
 	RegisterJSONCodec()
 
 	conn, err := grpc.NewClient(
@@ -33,14 +33,14 @@ func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*r
 		return nil, nil, fmt.Errorf("grpc dial: %w", err)
 	}
 
-	invoke := func(items []*report.Item) error {
+	invoke := func(items []*api.Item) error {
 		wire := make([]*wireItem, 0, len(items))
 		for _, it := range items {
 			if it == nil {
 				continue
 			}
 			var raw json.RawMessage
-			if src := it.Source(); src != nil {
+			if src := it.Source; src != nil {
 				if b, err := json.Marshal(src); err == nil {
 					raw = json.RawMessage(b)
 				}
@@ -48,8 +48,8 @@ func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*r
 			wire = append(wire, &wireItem{
 				Namespace: it.Namespace,
 				Name:      it.Name,
-				HandlerID: it.HandlerID(),
-				Result:    it.Result(),
+				HandlerID: it.HandlerID,
+				Result:    it.Result,
 				Source:    raw,
 			})
 		}
@@ -68,13 +68,13 @@ func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*r
 //	ch, stop, _ := ingest.PushChannel(ctx, "127.0.0.1:9090", 100, time.Second)
 //	defer stop()
 //	ch <- item
-func PushChannel(ctx context.Context, addr string, maxBatch int, maxWait time.Duration) (chan<- *report.Item, func() error, error) {
+func PushChannel(ctx context.Context, addr string, maxBatch int, maxWait time.Duration) (chan<- *api.Item, func() error, error) {
 	pub, closeConn, err := NewGRPCPublisher(ctx, addr)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	in := make(chan *report.Item, maxBatch*2)
+	in := make(chan *api.Item, maxBatch*2)
 	stopCh := make(chan struct{})
 
 	go func() {
@@ -82,7 +82,7 @@ func PushChannel(ctx context.Context, addr string, maxBatch int, maxWait time.Du
 			_ = closeConn()
 		}()
 
-		batch := make([]*report.Item, 0, maxBatch)
+		batch := make([]*api.Item, 0, maxBatch)
 		flush := func() {
 			if len(batch) == 0 {
 				return

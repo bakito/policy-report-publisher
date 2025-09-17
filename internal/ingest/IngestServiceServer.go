@@ -8,7 +8,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -42,10 +42,10 @@ type IngestService interface {
 }
 
 type ingestServer struct {
-	ch chan *report.Item
+	ch chan *api.Item
 }
 
-func newIngestServer(ch chan *report.Item) *ingestServer {
+func newIngestServer(ch chan *api.Item) *ingestServer {
 	return &ingestServer{ch: ch}
 }
 
@@ -69,7 +69,7 @@ func (s *ingestServer) PushItems(ctx context.Context, req *IngestItems) (*Ack, e
 				src = wi.Source
 			}
 		}
-		it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
+		it := api.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
 
 		select {
 		case s.ch <- it:
@@ -112,7 +112,7 @@ func (s *ingestServer) StreamItems(stream grpc.ServerStream) error {
 					src = wi.Source
 				}
 			}
-			it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
+			it := api.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
 
 			// stream.Context() is bound to this client-stream
 			select {
@@ -173,8 +173,8 @@ func _streamItemsHandler(srv any, stream grpc.ServerStream) error {
 // ... existing code ...
 // StartGRPC starts the JSON-over-gRPC ingest server.
 // - addr: e.g., ":9090" or "127.0.0.1:9090"
-// - ch: the same channel you use in your pipeline to publish *report.Item
-func StartGRPC(ctx context.Context, addr string, ch chan *report.Item) error {
+// - ch: the same channel you use in your pipeline to publish *api.Item
+func StartGRPC(ctx context.Context, addr string, ch chan *api.Item) error {
 	RegisterJSONCodec()
 
 	lis, err := (&net.ListenConfig{}).Listen(ctx, "tcp", addr)

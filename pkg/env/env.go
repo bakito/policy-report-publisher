@@ -8,11 +8,6 @@ import (
 const (
 	LogReports       = "LOG_REPORTS"
 	LeaderElectionNS = "LEADER_ELECTION_NAMESPACE"
-
-	HubbleServiceName = "HUBBLE_SERVICE"
-	HubbleInsecure    = "HUBBLE_INSECURE"
-
-	KubeArmorServiceName = "KUBE_ARMOR_SERVICE"
 )
 
 func Active(env string) bool {

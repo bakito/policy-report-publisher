@@ -10,6 +10,7 @@ import (
 
 	"github.com/bakito/policy-report-publisher/internal/ingest"
 	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	// Shared items channel for all ingest paths
-	itemCh := make(chan *report.Item, 1024)
+	itemCh := make(chan *api.Item, 1024)
 
 	// Start gRPC ingest endpoint (sidecars send items here)
 	grpcAddr := os.Getenv("PUBLISHER_GRPC_ADDR")

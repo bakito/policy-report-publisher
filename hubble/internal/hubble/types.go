@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 	"github.com/cilium/cilium/api/v1/flow"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,7 +20,7 @@ var consideredLabels = map[string]bool{
 	"product.fenaco.com/name":       true,
 }
 
-func toItem(f *flow.Flow) *report.Item {
+func toItem(f *flow.Flow) *api.Item {
 	dest, protocol := destination(f)
 	if dest == "" {
 		return nil
@@ -46,15 +46,15 @@ func toItem(f *flow.Flow) *report.Item {
 			Nanos: f.Time.GetNanos(),
 		},
 		Properties: map[string]string{
-			report.PropertyCreated: updatedTimeRFC3339(f),
-			report.PropertyUpdated: updatedTimeRFC3339(f),
-			"protocol":             protocol,
+			api.PropertyCreated: updatedTimeRFC3339(f),
+			api.PropertyUpdated: updatedTimeRFC3339(f),
+			"protocol":          protocol,
 		},
 	}
 
 	addPodLabels(f, pr)
 
-	return report.ItemFor("clilum-blocked-egress", f.Source.Namespace, f.Source.PodName, pr, f)
+	return api.ItemFor("clilum-blocked-egress", f.Source.Namespace, f.Source.PodName, pr, f)
 }
 
 func addPodLabels(f *flow.Flow, pr prv1alpha2.PolicyReportResult) {

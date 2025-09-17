@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher/pkg/api"
+	"github.com/bakito/policy-report-publisher/pkg/env"
 	"github.com/bakito/policy-report-publisher/version"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
@@ -28,9 +29,6 @@ import (
 
 const (
 	propCount = "count"
-
-	PropertyCreated = "created"
-	PropertyUpdated = "updated"
 )
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
@@ -109,12 +107,12 @@ func (h *handler) PolicyReportAvailable() (bool, error) {
 	return false, nil
 }
 
-func (h *handler) Update(ctx context.Context, report *Item) error {
+func (h *handler) Update(ctx context.Context, report *api.Item) error {
 	if report.Name == "" {
 		return nil
 	}
 	if h.logReports {
-		b, err := json.Marshal(report.source)
+		b, err := json.Marshal(report.Source)
 		if err == nil {
 			println(string(b))
 		}
@@ -126,7 +124,7 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 		return err
 	}
 
-	h.counter.WithLabelValues(report.handlerID).Inc()
+	h.counter.WithLabelValues(report.HandlerID).Inc()
 
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		pol, err := h.getPolicyReport(ctx, report, pod)
@@ -134,14 +132,14 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 			return err
 		}
 		_, err = controllerutil.CreateOrUpdate(ctx, h.client, pol, func() error {
-			addResult(pol, report.result)
+			addResult(pol, report.Result)
 			return nil
 		})
 		return err
 	})
 }
 
-func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
+func (h *handler) getPolicyReport(ctx context.Context, report *api.Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
 	podID := string(pod.GetUID())
 	policyID := fmt.Sprintf("prp-%s", podID)
 
@@ -197,13 +195,13 @@ func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alph
 	}
 	cnt++
 
-	created := oldProps[PropertyCreated]
+	created := oldProps[api.PropertyCreated]
 
 	newProps := newReport.Properties
 	maps.Copy(oldProps, newProps)
 	oldProps[propCount] = strconv.Itoa(cnt)
 	if created != "" {
-		oldProps[PropertyCreated] = created
+		oldProps[api.PropertyCreated] = created
 	}
 	return oldProps
 }

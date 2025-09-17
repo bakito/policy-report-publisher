@@ -3,7 +3,7 @@ package kubearmor
 import (
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -46,8 +46,8 @@ type Alert struct {
 	Cwd               string `json:"Cwd"`
 }
 
-func (a Alert) toItem() *report.Item {
-	return report.ItemFor("kubearmor", a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
+func (a Alert) toItem() *api.Item {
+	return api.ItemFor("kubearmor", a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
 
@@ -66,14 +66,14 @@ func (a Alert) toItem() *report.Item {
 			Nanos: a.Timestamp,
 		},
 		Properties: map[string]string{
-			report.PropertyCreated: a.UpdatedTimeRFC3339(),
-			report.PropertyUpdated: a.UpdatedTimeRFC3339(),
-			"process-name":         a.ProcessName,
-			"parent-process-name":  a.ParentProcessName,
-			"source":               a.Source,
-			"operation":            a.Operation,
-			"resource":             a.Resource,
-			"cwd":                  a.Cwd,
+			api.PropertyCreated:   a.UpdatedTimeRFC3339(),
+			api.PropertyUpdated:   a.UpdatedTimeRFC3339(),
+			"process-name":        a.ProcessName,
+			"parent-process-name": a.ParentProcessName,
+			"source":              a.Source,
+			"operation":           a.Operation,
+			"resource":            a.Resource,
+			"cwd":                 a.Cwd,
 		},
 	}, &a)
 }

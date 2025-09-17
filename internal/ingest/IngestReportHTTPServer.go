@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher/pkg/api"
 )
 
 // StartHTTP starts an HTTP server that ingests report items from sidecars.
 // - addr: e.g. ":8080" or "127.0.0.1:8080". It is recommended to bind to loopback.
 // - ch: channel where decoded report items are sent.
 // The server shuts down when ctx is done.
-func StartHTTP(ctx context.Context, addr string, ch chan *report.Item) error {
+func StartHTTP(ctx context.Context, addr string, ch chan *api.Item) error {
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -53,7 +53,7 @@ func StartHTTP(ctx context.Context, addr string, ch chan *report.Item) error {
 
 		// Accept either a single object or an array of objects.
 		if strings.HasPrefix(trimmed, "[") {
-			var items []*report.Item
+			var items []*api.Item
 			if err := json.Unmarshal([]byte(trimmed), &items); err != nil {
 				http.Error(w, "invalid JSON array: "+err.Error(), http.StatusBadRequest)
 				return
@@ -76,7 +76,7 @@ func StartHTTP(ctx context.Context, addr string, ch chan *report.Item) error {
 			return
 		}
 
-		var item report.Item
+		var item api.Item
 		if err := json.Unmarshal([]byte(trimmed), &item); err != nil {
 			http.Error(w, "invalid JSON object: "+err.Error(), http.StatusBadRequest)
 			return
