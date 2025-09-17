@@ -1,7 +1,6 @@
 package api
 
 import (
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -14,11 +13,11 @@ const (
 type Item struct {
 	client.ObjectKey
 	HandlerID string
-	Result    prv1alpha2.PolicyReportResult
+	Result    ReportResult
 	Source    any
 }
 
-func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source any) *Item {
+func ItemFor(handlerID string, namespace string, name string, result ReportResult, source any) *Item {
 	return &Item{
 		HandlerID: handlerID,
 		ObjectKey: types.NamespacedName{
@@ -28,4 +27,11 @@ func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.
 		Result: result,
 		Source: source,
 	}
+}
+
+type ReportResult struct {
+	Source     string
+	Policy     string
+	Rule       string
+	Properties map[string]string
 }

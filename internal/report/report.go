@@ -170,24 +170,33 @@ func (h *handler) getPolicyReport(ctx context.Context, report *api.Item, pod *co
 	return pol, nil
 }
 
-func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResult) {
+func addResult(pol *prv1alpha2.PolicyReport, result api.ReportResult) {
 	found := false
 
 	for i, res := range pol.Results {
 		if res.Source == result.Source && res.Policy == result.Policy && res.Rule == result.Rule {
 			result.Properties = mergeProperties(pol.Results[i], result)
-			pol.Results[i] = result
+			pol.Results[i] = asPolicyReportResult(result)
 			found = true
 		}
 	}
 
 	if !found {
-		pol.Results = append(pol.Results, result)
+		pol.Results = append(pol.Results, asPolicyReportResult(result))
 	}
 	pol.Summary.Fail++
 }
 
-func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alpha2.PolicyReportResult) map[string]string {
+func asPolicyReportResult(result api.ReportResult) prv1alpha2.PolicyReportResult {
+	return prv1alpha2.PolicyReportResult{
+		Rule:       result.Rule,
+		Policy:     result.Policy,
+		Source:     result.Source,
+		Properties: result.Properties,
+	}
+}
+
+func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport api.ReportResult) map[string]string {
 	oldProps := oldReport.Properties
 	cnt, err := strconv.Atoi(oldProps[propCount])
 	if err != nil {

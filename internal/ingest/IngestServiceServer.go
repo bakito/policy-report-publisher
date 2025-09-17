@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/bakito/policy-report-publisher/pkg/api"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -21,11 +20,11 @@ type IngestItems struct {
 }
 
 type wireItem struct {
-	Namespace string                        `json:"namespace"`
-	Name      string                        `json:"name"`
-	HandlerID string                        `json:"handlerId"`
-	Result    prv1alpha2.PolicyReportResult `json:"result"`
-	Source    json.RawMessage               `json:"source,omitempty"`
+	Namespace string           `json:"namespace"`
+	Name      string           `json:"name"`
+	HandlerID string           `json:"handlerId"`
+	Result    api.ReportResult `json:"result"`
+	Source    json.RawMessage  `json:"source,omitempty"`
 }
 
 // Ack is a simple acknowledgement payload.

@@ -1,6 +1,6 @@
 module github.com/bakito/policy-report-publisher
 
-go 1.25.0
+go 1.25.1
 
 require (
 	github.com/kyverno/kyverno v1.15.1
