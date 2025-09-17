@@ -9,7 +9,7 @@ import (
 )
 
 func Run(_ context.Context, reportChan chan *report.Item) error {
-	item := report.ItemFor("dummy", "ns", "pod", prv1alpha2.PolicyReportResult{}, "dummy")
+	item := report.ItemFor("dummy", "ns", "pod", prv1alpha2.PolicyReportResult{Category: "dummy"}, "dummy")
 	reportChan <- item
 	time.Sleep(1 * time.Second)
 	return nil

@@ -32,6 +32,10 @@ type Item struct {
 	source    any
 }
 
+func (i *Item) HandlerID() string                     { return i.handlerID }
+func (i *Item) Result() prv1alpha2.PolicyReportResult { return i.result }
+func (i *Item) Source() any                           { return i.source }
+
 func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source any) *Item {
 	return &Item{
 		handlerID: handlerID,

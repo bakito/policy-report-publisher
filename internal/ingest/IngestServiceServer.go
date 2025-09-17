@@ -2,12 +2,14 @@ package ingest
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"net"
 	"time"
 
 	"github.com/bakito/policy-report-publisher/internal/report"
+	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -15,7 +17,15 @@ import (
 
 // IngestItems represents a batch pushed by the sidecar.
 type IngestItems struct {
-	Items []*report.Item `json:"items"`
+	Items []*wireItem `json:"items"`
+}
+
+type wireItem struct {
+	Namespace string                        `json:"namespace"`
+	Name      string                        `json:"name"`
+	HandlerID string                        `json:"handlerId"`
+	Result    prv1alpha2.PolicyReportResult `json:"result"`
+	Source    json.RawMessage               `json:"source,omitempty"`
 }
 
 // Ack is a simple acknowledgement payload.
@@ -44,10 +54,23 @@ func (s *ingestServer) PushItems(ctx context.Context, req *IngestItems) (*Ack, e
 		return &Ack{Accepted: 0}, nil
 	}
 	accepted := 0
-	for _, it := range req.Items {
-		if it == nil {
+	for _, wi := range req.Items {
+		if wi == nil {
 			continue
 		}
+		var src any
+		if len(wi.Source) > 0 && string(wi.Source) != "null" {
+			// keep as generic map to avoid tight coupling
+			var m map[string]any
+			if err := json.Unmarshal(wi.Source, &m); err == nil {
+				src = m
+			} else {
+				// fallback: store as raw json string
+				src = json.RawMessage(wi.Source)
+			}
+		}
+		it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
+
 		select {
 		case s.ch <- it:
 			accepted++
@@ -76,10 +99,21 @@ func (s *ingestServer) StreamItems(stream grpc.ServerStream) error {
 			return nil
 		}
 
-		for _, it := range req.Items {
-			if it == nil {
+		for _, wi := range req.Items {
+			if wi == nil {
 				continue
 			}
+			var src any
+			if len(wi.Source) > 0 && string(wi.Source) != "null" {
+				var m map[string]any
+				if err := json.Unmarshal(wi.Source, &m); err == nil {
+					src = m
+				} else {
+					src = json.RawMessage(wi.Source)
+				}
+			}
+			it := report.ItemFor(wi.HandlerID, wi.Namespace, wi.Name, wi.Result, src)
+
 			// stream.Context() is bound to this client-stream
 			select {
 			case s.ch <- it:
@@ -135,6 +169,8 @@ func _streamItemsHandler(srv any, stream grpc.ServerStream) error {
 	return srv.(*ingestServer).StreamItems(stream)
 }
 
+// StartGRPC unchanged below...
+// ... existing code ...
 // StartGRPC starts the JSON-over-gRPC ingest server.
 // - addr: e.g., ":9090" or "127.0.0.1:9090"
 // - ch: the same channel you use in your pipeline to publish *report.Item

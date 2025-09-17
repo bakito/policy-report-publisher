@@ -2,6 +2,7 @@ package ingest
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -33,11 +34,31 @@ func NewGRPCPublisher(ctx context.Context, addr string) (publish func(items []*r
 	}
 
 	invoke := func(items []*report.Item) error {
-		req := &IngestItems{Items: items}
+		wire := make([]*wireItem, 0, len(items))
+		for _, it := range items {
+			if it == nil {
+				continue
+			}
+			var raw json.RawMessage
+			if src := it.Source(); src != nil {
+				if b, err := json.Marshal(src); err == nil {
+					raw = json.RawMessage(b)
+				}
+			}
+			wire = append(wire, &wireItem{
+				Namespace: it.Namespace,
+				Name:      it.Name,
+				HandlerID: it.HandlerID(),
+				Result:    it.Result(),
+				Source:    raw,
+			})
+		}
+		var req = &IngestItems{Items: wire}
 		var resp Ack
 		return conn.Invoke(ctx, "/policyreport.publisher.v1.IngestService/PushItems", req, &resp)
 	}
 	return invoke, conn.Close, nil
+
 }
 
 // PushChannel creates a channel that automatically batches items and pushes them
