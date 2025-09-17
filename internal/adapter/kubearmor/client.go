@@ -58,5 +58,5 @@ func newLogClient(o klog.Options) (*klog.Feeder, error) {
 		return klog.NewClient(gRPC, o, client.K8sClientset)
 	}
 
-	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.HubbleServiceName)
+	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.KubeArmorServiceName)
 }
