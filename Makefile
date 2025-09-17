@@ -6,14 +6,10 @@ rbac: tb.controller-gen ## Generate RBAC resources
 
 lint: tb.golangci-lint
 	$(TB_GOLANGCI_LINT) run --fix
-	cd hubble && $(TB_GOLANGCI_LINT) run --fix --config ../.golangci.yaml
-	cd kubearmor && $(TB_GOLANGCI_LINT) run --fix --config ../.golangci.yaml
 
 # go mod tidy
 tidy:
 	go mod tidy
-	cd hubble && go mod tidy
-	cd kubearmor && go mod tidy
 
 all: tidy rbac lint
 
