@@ -6,7 +6,7 @@ require (
 	github.com/cilium/cilium v1.18.2
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/kubearmor/kubearmor-client v1.4.4
-	github.com/kyverno/kyverno v1.15.1
+	github.com/kyverno/kyverno v1.15.2
 	github.com/prometheus/client_golang v1.23.2
 	google.golang.org/grpc v1.75.1
 	k8s.io/api v0.33.3
