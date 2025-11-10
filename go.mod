@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/cilium/cilium v1.18.3
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/kubearmor/kubearmor-client v1.4.4
 	github.com/kyverno/kyverno v1.15.2
 	github.com/prometheus/client_golang v1.23.2
