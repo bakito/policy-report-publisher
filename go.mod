@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/cilium/cilium v1.18.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
-	github.com/kubearmor/kubearmor-client v1.4.4
+	github.com/kubearmor/kubearmor-client v1.4.6
 	github.com/kyverno/kyverno v1.16.0
 	github.com/prometheus/client_golang v1.23.2
 	google.golang.org/grpc v1.77.0
@@ -148,6 +148,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/cel-go v0.26.1 // indirect
@@ -178,7 +179,7 @@ require (
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/kubearmor/KubeArmor/KubeArmor v0.0.0-20250707142851-6b7fc953dd6c // indirect
 	github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20250707142851-6b7fc953dd6c // indirect
-	github.com/kubearmor/KubeArmor/protobuf v0.0.0-20250707142851-6b7fc953dd6c // indirect
+	github.com/kubearmor/KubeArmor/protobuf v0.0.0-20251112065124-b3d682e08d62 // indirect
 	github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877 // indirect
 	github.com/kyverno/kyverno-json v0.0.4-0.20240730143747-aade3d42fc0e // indirect
 	github.com/letsencrypt/boulder v0.0.0-20241125213356-ded2e5e61030 // indirect
