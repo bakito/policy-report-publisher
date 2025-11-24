@@ -231,8 +231,8 @@ github.com/coreos/go-oidc/v3 v3.14.1/go.mod h1:HaZ3szPaZ0e4r6ebqvsLWlk2Tn+aejfmr
 github.com/coreos/go-systemd/v22 v22.5.0 h1:RrqgGjYQKalulkV8NGVIfkXQf6YYmOyiJKk8iXXhfZs=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
-github.com/creack/pty v1.1.21 h1:1/QdRyBaHHJP61QkWMXlOIBfsgdDeeKfK8SYVUWJKf0=
-github.com/creack/pty v1.1.21/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
+github.com/creack/pty v1.1.19 h1:tUN6H7LWqNx4hQVxomd0CVsDwaDr9gaRQaI4GpSmrsA=
+github.com/creack/pty v1.1.19/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
 github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467 h1:uX1JmpONuD549D73r6cgnxyUu18Zb7yHAy5AYU0Pm4Q=
 github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467/go.mod h1:uzvlm1mxhHkdfqitSA92i7Se+S9ksOn3a3qmv/kyOCw=
 github.com/danieljoos/wincred v1.2.2 h1:774zMFJrqaeYCK2W57BgAem/MLi6mtSE47MB6BOJ0i0=
@@ -551,10 +551,10 @@ github.com/kubearmor/KubeArmor/KubeArmor v0.0.0-20250707142851-6b7fc953dd6c h1:Y
 github.com/kubearmor/KubeArmor/KubeArmor v0.0.0-20250707142851-6b7fc953dd6c/go.mod h1:xoS9dkxZk6qseO37g0LHBz3u4XVGhON73tYuIKhVZx4=
 github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20250707142851-6b7fc953dd6c h1:pSucEVCsClEFJsu0zLppGngop6+Dgh1ztvx9K+L+DM4=
 github.com/kubearmor/KubeArmor/pkg/KubeArmorController v0.0.0-20250707142851-6b7fc953dd6c/go.mod h1:xekCBFS6h63sH25RJaQZiPbCJ7HDKGIk9P1f2ZhVExU=
-github.com/kubearmor/KubeArmor/protobuf v0.0.0-20250707142851-6b7fc953dd6c h1:DnQKvgM0vJUwbUY+riDtM2NZSFLImgNRlZPUd/ZMrYw=
-github.com/kubearmor/KubeArmor/protobuf v0.0.0-20250707142851-6b7fc953dd6c/go.mod h1:ZQIx9XAMhZ+D3obBOaCr62DwcxpxLPUHSkLqECovA2c=
-github.com/kubearmor/kubearmor-client v1.4.4 h1:5XgU5NUXs6cw08vMNbZ80x4i2Rq0oNDIio4dKls0bHc=
-github.com/kubearmor/kubearmor-client v1.4.4/go.mod h1:bbISibiTu2WsF3i+MghGXxFdQE4lJNT2oKeoU8RLWzE=
+github.com/kubearmor/KubeArmor/protobuf v0.0.0-20251112065124-b3d682e08d62 h1:2ve8oG5GxO0R4veMP6Af63nh5CyBcx56OTp415txSdA=
+github.com/kubearmor/KubeArmor/protobuf v0.0.0-20251112065124-b3d682e08d62/go.mod h1:PyS1HDa7oXyxqXYvuLHphlYGcCoB3eLXWt+TwgUDJV0=
+github.com/kubearmor/kubearmor-client v1.4.6 h1:RvJSPdEGVo7LCxQ3/1/FoZcUqRXU08w2xZ7XcB59FAY=
+github.com/kubearmor/kubearmor-client v1.4.6/go.mod h1:ITQy3ZBpDDXfORLMWLFxyZXB/ZNFog8Q5LHLsmkC6NQ=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877 h1:XOLJNGX/q6MVpI8p8MKvk6jGBMvO4CrdwrizMMSsaRU=
