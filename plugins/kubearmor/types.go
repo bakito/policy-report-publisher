@@ -3,9 +3,7 @@ package kubearmor
 import (
 	"time"
 
-	"github.com/bakito/policy-report-publisher/internal/report"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/bakito/policy-report-publisher-shared/types"
 )
 
 const reportSource = "KubeArmor"
@@ -46,8 +44,8 @@ type Alert struct {
 	Cwd               string `json:"Cwd"`
 }
 
-func (a Alert) toItem() *report.Item {
-	return report.ItemFor("kubearmor", a.NamespaceName, a.PodName, prv1alpha2.PolicyReportResult{
+func (a Alert) toItem() *types.Item {
+	return types.ItemFor("kubearmor", a.NamespaceName, a.PodName, types.PolicyReportResult{
 		Category: a.Type,
 		Message:  a.Result,
 
@@ -59,26 +57,24 @@ func (a Alert) toItem() *report.Item {
 		//   - warn: indicates that the policy requirements and not met, and the policy is not scored
 		//   - error: indicates that the policy could not be evaluated
 		//   - skip: indicates that the policy was not selected based on user inputs or applicability
-		Result: "fail",
-		Scored: true,
-		Source: reportSource,
-		Timestamp: metav1.Timestamp{
-			Nanos: a.Timestamp,
-		},
+		Result:    "fail",
+		Scored:    true,
+		Source:    reportSource,
+		Timestamp: a.Timestamp,
 		Properties: map[string]string{
-			report.PropertyCreated: a.UpdatedTimeRFC3339(),
-			report.PropertyUpdated: a.UpdatedTimeRFC3339(),
-			"process-name":         a.ProcessName,
-			"parent-process-name":  a.ParentProcessName,
-			"source":               a.Source,
-			"operation":            a.Operation,
-			"resource":             a.Resource,
-			"cwd":                  a.Cwd,
+			types.PropertyCreated: a.UpdatedTimeRFC3339(),
+			types.PropertyUpdated: a.UpdatedTimeRFC3339(),
+			"process-name":        a.ProcessName,
+			"parent-process-name": a.ParentProcessName,
+			"source":              a.Source,
+			"operation":           a.Operation,
+			"resource":            a.Resource,
+			"cwd":                 a.Cwd,
 		},
 	}, &a)
 }
 
-func (a Alert) resultSeverity() prv1alpha2.PolicySeverity {
+func (a Alert) resultSeverity() types.PolicySeverity {
 	// AubeArmor: severity: [1-10]  # --> optional (1 by default)
 
 	// PolicySeverity has one of the following values:

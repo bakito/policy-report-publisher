@@ -13,7 +13,69 @@
       ]
     }
   ],
-  "extends": [
-    "config:recommended"
+  "golang": {
+    "minimumReleaseAge": "3 days"
+  },
+  "packageRules": [
+    {
+      "description": "Critical: Keep shared module stable",
+      "matchPaths": [
+        "shared/**"
+      ],
+      "matchManagers": [
+        "gomod"
+      ],
+      "groupName": "shared-module",
+      "stabilityDays": 7,
+      "prPriority": 10
+    },
+    {
+      "description": "Plugin hubble can update independently",
+      "matchPaths": [
+        "plugins/hubble/**"
+      ],
+      "matchManagers": [
+        "gomod"
+      ],
+      "excludePackagePatterns": [
+        "github.com/bakito/policy-report-publisher-shared"
+      ],
+      "groupName": "plugin1",
+      "schedule": [
+        "at any time"
+      ],
+      "prPriority": 5
+    },
+    {
+      "description": "Plugin kubearmor can update independently",
+      "matchPaths": [
+        "plugins/kubearmor/**"
+      ],
+      "matchManagers": [
+        "gomod"
+      ],
+      "excludePackagePatterns": [
+        "github.com/bakito/policy-report-publisher-shared"
+      ],
+      "groupName": "plugin2",
+      "schedule": [
+        "at any time"
+      ],
+      "prPriority": 5
+    },
+    {
+      "description": "Main app updates",
+      "matchPaths": [
+        "go.mod"
+      ],
+      "matchManagers": [
+        "gomod"
+      ],
+      "excludePackagePatterns": [
+        "github.com/bakito/policy-report-publisher-shared"
+      ],
+      "groupName": "main-app",
+      "prPriority": 7
+    }
   ]
 }
