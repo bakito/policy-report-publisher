@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bakito/policy-report-publisher/internal/env"
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher-shared/types"
 	"github.com/kubearmor/kubearmor-client/k8s"
 	klog "github.com/kubearmor/kubearmor-client/log"
 )
 
-func Run(ctx context.Context, reportChan chan *report.Item) error {
+const EnvKubeArmorServiceName = "KUBE_ARMOR_SERVICE"
+
+func Run(ctx context.Context, reportChan chan *types.Item) error {
 	eventChan := make(chan klog.EventInfo)
 	o := klog.Options{
 		EventChan: eventChan,
@@ -50,7 +51,7 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 }
 
 func newLogClient(o klog.Options) (*klog.Feeder, error) {
-	if gRPC, ok := os.LookupEnv(env.KubeArmorServiceName); ok {
+	if gRPC, ok := os.LookupEnv(EnvKubeArmorServiceName); ok {
 		client, err := k8s.ConnectK8sClient()
 		if err != nil {
 			return nil, err
@@ -58,5 +59,5 @@ func newLogClient(o klog.Options) (*klog.Feeder, error) {
 		return klog.NewClient(gRPC, o, client.K8sClientset)
 	}
 
-	return nil, fmt.Errorf("kubearmor service name variable must %q be set", env.KubeArmorServiceName)
+	return nil, fmt.Errorf("kubearmor service name variable must %q be set", EnvKubeArmorServiceName)
 }

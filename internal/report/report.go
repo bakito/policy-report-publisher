@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher-shared/env"
+	"github.com/bakito/policy-report-publisher-shared/types"
 	"github.com/bakito/policy-report-publisher/version"
 	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
 	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
@@ -17,7 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
+	amt "k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/discovery"
@@ -29,8 +30,7 @@ import (
 const (
 	propCount = "count"
 
-	PropertyCreated = "created"
-	PropertyUpdated = "updated"
+	LogReports = "LOG_REPORTS"
 )
 
 var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
@@ -59,7 +59,7 @@ func NewHandler() (Handler, error) {
 		client:     kc,
 		discovery:  dcl,
 		clientset:  cs,
-		logReports: env.Active(env.LogReports),
+		logReports: env.Active(LogReports),
 		counter:    counter,
 	}, nil
 }
@@ -109,24 +109,24 @@ func (h *handler) PolicyReportAvailable() (bool, error) {
 	return false, nil
 }
 
-func (h *handler) Update(ctx context.Context, report *Item) error {
+func (h *handler) Update(ctx context.Context, report *types.Item) error {
 	if report.Name == "" {
 		return nil
 	}
 	if h.logReports {
-		b, err := json.Marshal(report.source)
+		b, err := json.Marshal(report.Source)
 		if err == nil {
 			println(string(b))
 		}
 	}
 
 	pod := &corev1.Pod{}
-	err := h.client.Get(ctx, report.ObjectKey, pod)
+	err := h.client.Get(ctx, client.ObjectKey{Namespace: report.Namespace, Name: report.Name}, pod)
 	if err != nil {
 		return err
 	}
 
-	h.counter.WithLabelValues(report.handlerID).Inc()
+	h.counter.WithLabelValues(report.HandlerID).Inc()
 
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		pol, err := h.getPolicyReport(ctx, report, pod)
@@ -134,19 +134,19 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 			return err
 		}
 		_, err = controllerutil.CreateOrUpdate(ctx, h.client, pol, func() error {
-			addResult(pol, report.result)
+			addResult(pol, report.Result)
 			return nil
 		})
 		return err
 	})
 }
 
-func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
+func (h *handler) getPolicyReport(ctx context.Context, report *types.Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
 	podID := string(pod.GetUID())
 	policyID := fmt.Sprintf("prp-%s", podID)
 
 	pol := &prv1alpha2.PolicyReport{}
-	err := h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
+	err := h.client.Get(ctx, amt.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &prv1alpha2.PolicyReport{
@@ -172,24 +172,28 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1
 	return pol, nil
 }
 
-func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResult) {
+func addResult(pol *prv1alpha2.PolicyReport, result types.PolicyReportResult) {
 	found := false
 
 	for i, res := range pol.Results {
 		if res.Source == result.Source && res.Policy == result.Policy && res.Rule == result.Rule {
 			result.Properties = mergeProperties(pol.Results[i], result)
-			pol.Results[i] = result
+			pol.Results[i] = convertToPolicyReportResult(result)
 			found = true
 		}
 	}
 
 	if !found {
-		pol.Results = append(pol.Results, result)
+		pol.Results = append(pol.Results, convertToPolicyReportResult(result))
 	}
 	pol.Summary.Fail++
 }
 
-func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alpha2.PolicyReportResult) map[string]string {
+func convertToPolicyReportResult(result types.PolicyReportResult) prv1alpha2.PolicyReportResult {
+	return prv1alpha2.PolicyReportResult{}
+}
+
+func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport types.PolicyReportResult) map[string]string {
 	oldProps := oldReport.Properties
 	cnt, err := strconv.Atoi(oldProps[propCount])
 	if err != nil {
@@ -197,13 +201,13 @@ func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alph
 	}
 	cnt++
 
-	created := oldProps[PropertyCreated]
+	created := oldProps[types.PropertyCreated]
 
 	newProps := newReport.Properties
 	maps.Copy(oldProps, newProps)
 	oldProps[propCount] = strconv.Itoa(cnt)
 	if created != "" {
-		oldProps[PropertyCreated] = created
+		oldProps[types.PropertyCreated] = created
 	}
 	return oldProps
 }

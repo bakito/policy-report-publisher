@@ -5,16 +5,21 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"plugin"
 	"strings"
 	"syscall"
 
-	"github.com/bakito/policy-report-publisher/internal/adapter/hubble"
-	"github.com/bakito/policy-report-publisher/internal/adapter/kubearmor"
-	"github.com/bakito/policy-report-publisher/internal/env"
+	"github.com/bakito/policy-report-publisher-shared/env"
+	"github.com/bakito/policy-report-publisher-shared/types"
 	"github.com/bakito/policy-report-publisher/internal/metrics"
 	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/bakito/policy-report-publisher/version"
 	"k8s.io/klog/v2"
+)
+
+const (
+	LogReports       = "LOG_REPORTS"
+	LeaderElectionNS = "LEADER_ELECTION_NAMESPACE"
 )
 
 func main() {
@@ -23,17 +28,8 @@ func main() {
 	slog.SetDefault(logger)
 	klog.SetSlogLogger(logger)
 
-	if env.Empty(env.HubbleServiceName) && env.Empty(env.KubeArmorServiceName) {
-		slog.ErrorContext(ctx, "either 'Hubble' or 'KubeArmor' must be enabled",
-			"hubble", env.HubbleServiceName,
-			"kubearmor", env.KubeArmorServiceName)
-		os.Exit(1)
-	}
-
 	slog.InfoContext(ctx, "policy-report-publisher", "version", version.Version,
-		"hubble", os.Getenv(env.HubbleServiceName),
-		"kubearmor", os.Getenv(env.KubeArmorServiceName),
-		"log-reports", env.Active(env.LogReports))
+		"log-reports", env.Active(LogReports))
 
 	// Initialize the report handler
 	handler, err := report.NewHandler()
@@ -62,7 +58,7 @@ func main() {
 
 	go metrics.Start(ctx)
 
-	if ns, ok := os.LookupEnv(env.LeaderElectionNS); ok && strings.TrimSpace(ns) != "" {
+	if ns, ok := os.LookupEnv(LeaderElectionNS); ok && strings.TrimSpace(ns) != "" {
 		if err := handler.RunAsLeader(ctx, cancel, ns, run); err != nil {
 			slog.ErrorContext(ctx, "error running with leader election", "error", err)
 			os.Exit(1)
@@ -74,7 +70,7 @@ func main() {
 
 func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc) {
 	// Create a channel for reports
-	reportChan := make(chan *report.Item, 100) // Buffered for performance
+	reportChan := make(chan *types.Item, 100) // Buffered for performance
 
 	// Handle OS signals for graceful shutdown
 	sigChan := make(chan os.Signal, 1)
@@ -85,8 +81,7 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 		cancel()
 	}()
 
-	start(ctx, reportChan, cancel, "KubeArmor", env.KubeArmorServiceName, kubearmor.Run)
-	start(ctx, reportChan, cancel, "Hubble", env.HubbleServiceName, hubble.Run)
+	startPlugins(ctx, reportChan, cancel)
 
 	// Process reports from the channel
 	for {
@@ -107,14 +102,52 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 	}
 }
 
+func startPlugins(ctx context.Context, reportChan chan *types.Item, cancel context.CancelFunc) {
+	plugins, err := os.ReadDir("plugins")
+	if err != nil {
+		if os.IsNotExist(err) {
+			slog.InfoContext(ctx, "no plugins directory found, skipping plugin loading")
+			return
+		}
+		slog.ErrorContext(ctx, "error reading plugins directory", "error", err)
+		return
+	}
+
+	for _, p := range plugins {
+		if !p.IsDir() && strings.HasSuffix(p.Name(), ".so") {
+			pluginPath := "plugins/" + p.Name()
+			plug, err := plugin.Open(pluginPath)
+			if err != nil {
+				slog.ErrorContext(ctx, "error opening plugin", "path", pluginPath, "error", err)
+				continue
+			}
+
+			runSymbol, err := plug.Lookup("Run")
+			if err != nil {
+				slog.ErrorContext(ctx, "error looking up Run symbol in plugin", "path", pluginPath, "error", err)
+				continue
+			}
+
+			runFunc, ok := runSymbol.(func(context.Context, chan *types.Item) error)
+			if !ok {
+				slog.ErrorContext(ctx, "invalid Run function signature in plugin", "path", pluginPath)
+				continue
+			}
+
+			pluginName := strings.TrimSuffix(p.Name(), ".so")
+			start(ctx, reportChan, cancel, pluginName, "PLUGIN_"+pluginName, runFunc)
+		}
+	}
+}
+
 func start(ctx context.Context,
-	reportChan chan *report.Item,
+	reportChan chan *types.Item,
 	cancel context.CancelFunc,
 	name string,
 	serviceVar string,
-	run func(ctx context.Context, reportChan chan *report.Item) error,
+	run func(ctx context.Context, reportChan chan *types.Item) error,
 ) {
-	if !env.Empty(serviceVar) {
+	if strings.HasPrefix(serviceVar, "PLUGIN_") || !env.Empty(serviceVar) {
 		go func() {
 			slog.InfoContext(ctx, "starting", "name", name, "service", os.Getenv(serviceVar))
 			if err := run(ctx, reportChan); err != nil {

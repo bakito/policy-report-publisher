@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bakito/policy-report-publisher/internal/env"
-	"github.com/bakito/policy-report-publisher/internal/report"
+	"github.com/bakito/policy-report-publisher-shared/env"
+	"github.com/bakito/policy-report-publisher-shared/types"
 	"github.com/cilium/cilium/api/v1/flow"
 	observerpb "github.com/cilium/cilium/api/v1/observer"
 	"github.com/cilium/cilium/hubble/pkg/defaults"
@@ -23,7 +23,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func Run(ctx context.Context, reportChan chan *report.Item) error {
+const (
+	EnvHubbleServiceName = "HUBBLE_SERVICE"
+	EnvHubbleInsecure    = "HUBBLE_INSECURE"
+)
+
+func Run(ctx context.Context, reportChan chan *types.Item) error {
 	client, cleanup, err := newClient()
 	if err != nil {
 		return err
@@ -46,10 +51,10 @@ func Run(ctx context.Context, reportChan chan *report.Item) error {
 
 func newClient() (observerpb.ObserverClient, func() error, error) {
 	var gRPC string
-	if val, ok := os.LookupEnv(env.HubbleServiceName); ok {
+	if val, ok := os.LookupEnv(EnvHubbleServiceName); ok {
 		gRPC = val
 	} else {
-		return nil, nil, fmt.Errorf("hubble service name variable must %q be set", env.HubbleServiceName)
+		return nil, nil, fmt.Errorf("hubble service name variable must %q be set", EnvHubbleServiceName)
 	}
 
 	// read flows from a hubble server
@@ -67,7 +72,7 @@ func newClient() (observerpb.ObserverClient, func() error, error) {
 func newConn(target string) (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 
-	if env.Active(env.HubbleInsecure) {
+	if env.Active(EnvHubbleInsecure) {
 		creds = insecure.NewCredentials()
 	} else {
 		tlsConfig := tls.Config{
@@ -85,7 +90,7 @@ func newConn(target string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func getFlows(ctx context.Context, client observerpb.ObserverClient, reportChan chan *report.Item, req *observerpb.GetFlowsRequest) error {
+func getFlows(ctx context.Context, client observerpb.ObserverClient, reportChan chan *types.Item, req *observerpb.GetFlowsRequest) error {
 	b, err := client.GetFlows(ctx, req)
 	if err != nil {
 		return err
