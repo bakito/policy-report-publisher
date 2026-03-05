@@ -4,8 +4,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  schedule: # daily at 02:34 UTC
-    - cron: '34 02 * * *'
+  schedule: 
+    - cron: '45 04 * * *'
   workflow_dispatch:
 permissions:
   contents: read
