@@ -13,6 +13,9 @@ tidy:
 
 all: tidy rbac lint
 
+check-vulnerabilities:
+	go run golang.org/x/vuln/cmd/govulncheck@latest -show verbose,color ./...
+
 pf-hubble:
 	kubectl port-forward -n kube-system svc/hubble-relay 32766:443
 pf-hubble-insecure:
