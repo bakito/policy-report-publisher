@@ -1,6 +1,6 @@
 module github.com/bakito/policy-report-publisher
 
-go 1.25.7
+go 1.26
 
 require (
 	github.com/cilium/cilium v1.18.6
