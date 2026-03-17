@@ -577,8 +577,8 @@ github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877 h1:XOLJNGX/q
 github.com/kyverno/go-jmespath v0.4.1-0.20231124160150-95e59c162877/go.mod h1:yzDHaKovQy16rjN4kFnjF+IdNoN4p1ndw+va6+B8zUU=
 github.com/kyverno/go-jmespath/internal/testify v1.5.2-0.20230630133209-945021c749d9 h1:lL311dF3a2aeNibJj8v+uhFU3XkvRHZmCtAdSPOrQYY=
 github.com/kyverno/go-jmespath/internal/testify v1.5.2-0.20230630133209-945021c749d9/go.mod h1:XRxUGHIiCy1WYma1CdfdO1WOhIe8dLPTENaZr5D1ex4=
-github.com/kyverno/kyverno v1.5.0-rc1.0.20260317195648-a5cba948a7f5 h1:lngoQItJglPixYHYUDlungK4Ldj+s3mP4mpPhQ/JDps=
-github.com/kyverno/kyverno v1.5.0-rc1.0.20260317195648-a5cba948a7f5/go.mod h1:Wc3+jgn1Pda+e1C3PBG+ytHoMXEIRnKYPwNBBrm2XMQ=
+github.com/kyverno/kyverno v1.17.1 h1:eJ/6QePaQOI8aj43xRrb7Tl23m70xMTnh9s1ho2l6MA=
+github.com/kyverno/kyverno v1.17.1/go.mod h1:FjxzPAQ3XlTseXGi+uKcH0aOW7GMlgaxa5RGZW+kDTo=
 github.com/kyverno/kyverno-json v0.0.4-0.20240730143747-aade3d42fc0e h1:gh9iMuJS8yloxo3JIzvgLWZWwy5iRjEkA8/U7rK3iu8=
 github.com/kyverno/kyverno-json v0.0.4-0.20240730143747-aade3d42fc0e/go.mod h1:3LgZogzltja+Sx0o5CIa7d7+991v8sWXHskU0fWSOsQ=
 github.com/lestrrat-go/blackmagic v1.0.4 h1:IwQibdnf8l2KoO+qC3uT4OaTWsW7tuRQXy9TRN9QanA=
