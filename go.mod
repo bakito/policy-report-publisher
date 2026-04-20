@@ -3,7 +3,7 @@ module github.com/bakito/policy-report-publisher
 go 1.26
 
 require (
-	github.com/cilium/cilium v1.18.8
+	github.com/cilium/cilium v1.19.3
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/kubearmor/kubearmor-client v1.4.6
 	github.com/kyverno/kyverno v1.17.1
@@ -119,7 +119,7 @@ require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32 // indirect
 	github.com/go-chi/chi/v5 v5.2.5 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zerologr v1.2.3 // indirect
@@ -311,12 +311,12 @@ require (
 	gopkg.in/ini.v1 v1.67.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.35.2 // indirect
-	k8s.io/component-base v0.35.2 // indirect
+	k8s.io/apiextensions-apiserver v0.35.3 // indirect
+	k8s.io/component-base v0.35.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // indirect
-	k8s.io/kubectl v0.35.2 // indirect
+	k8s.io/kubectl v0.35.3 // indirect
 	k8s.io/pod-security-admission v0.34.1 // indirect
-	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2 // indirect
+	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/kustomize/api v0.21.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.21.1 // indirect
