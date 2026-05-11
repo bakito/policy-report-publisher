@@ -6,9 +6,9 @@ require (
 	github.com/cilium/cilium v1.19.3
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/kubearmor/kubearmor-client v1.4.6
-	github.com/kyverno/kyverno v1.17.1
+	github.com/kyverno/kyverno v1.17.2
 	github.com/prometheus/client_golang v1.23.2
-	google.golang.org/grpc v1.79.3
+	google.golang.org/grpc v1.80.0
 	k8s.io/api v0.35.4
 	k8s.io/apimachinery v0.35.4
 	k8s.io/cli-runtime v0.35.4
@@ -275,16 +275,16 @@ require (
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea // indirect
 	gitlab.com/gitlab-org/api/client-go v1.46.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0 // indirect
-	go.opentelemetry.io/otel v1.42.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.42.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.42.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.42.0 // indirect
-	go.opentelemetry.io/otel/exporters/prometheus v0.64.0 // indirect
-	go.opentelemetry.io/otel/metric v1.42.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.42.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.42.0 // indirect
-	go.opentelemetry.io/otel/trace v1.42.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0 // indirect
+	go.opentelemetry.io/otel v1.43.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.43.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.43.0 // indirect
+	go.opentelemetry.io/otel/exporters/prometheus v0.65.0 // indirect
+	go.opentelemetry.io/otel/metric v1.43.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.43.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.43.0 // indirect
+	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
@@ -301,10 +301,9 @@ require (
 	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
-	gonum.org/v1/gonum v0.17.0 // indirect
 	google.golang.org/api v0.272.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260316180232-0b37fe3546d5 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260316180232-0b37fe3546d5 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
