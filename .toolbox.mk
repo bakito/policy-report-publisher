@@ -17,7 +17,7 @@ TB_GOLANGCI_LINT ?= $(TB_LOCALBIN)/golangci-lint
 
 ## Tool Versions
 # renovate: packageName=github.com/kubernetes-sigs/controller-tools
-TB_CONTROLLER_GEN_VERSION ?= v0.20.1
+TB_CONTROLLER_GEN_VERSION ?= v0.21.0
 # renovate: packageName=github.com/golangci/golangci-lint/v2
 TB_GOLANGCI_LINT_VERSION ?= v2.11.4
 TB_GOLANGCI_LINT_VERSION_NUM ?= $(call STRIP_V,$(TB_GOLANGCI_LINT_VERSION))
