@@ -150,14 +150,10 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1
 	if err != nil {
 		if errors.IsNotFound(err) {
 			pol = &openreportsv1alpha1.Report{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "Report",
-					APIVersion: openreportsv1alpha1.GroupVersion.String(),
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: report.Namespace,
-					Name:      policyID,
-				},
+				Kind:       "Report",
+				APIVersion: openreportsv1alpha1.GroupVersion.String(),
+				Namespace:  report.Namespace,
+				Name:       policyID,
 			}
 
 			_ = controllerutil.SetOwnerReference(pod, pol, h.client.Scheme())
