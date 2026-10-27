@@ -3,10 +3,10 @@ package report
 import (
 	"context"
 
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
-	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
+	openreportsv1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/discovery"
+	kubernetes "k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -20,18 +20,18 @@ type handler struct {
 	client     client.Client
 	discovery  *discovery.DiscoveryClient
 	logReports bool
-	clientset  clientset.Interface
+	clientset  kubernetes.Interface
 	counter    *prometheus.CounterVec
 }
 
 type Item struct {
 	client.ObjectKey
 	handlerID string
-	result    prv1alpha2.PolicyReportResult
+	result    openreportsv1alpha1.ReportResult
 	source    any
 }
 
-func ItemFor(handlerID string, namespace string, name string, result prv1alpha2.PolicyReportResult, source any) *Item {
+func ItemFor(handlerID string, namespace string, name string, result openreportsv1alpha1.ReportResult, source any) *Item {
 	return &Item{
 		handlerID: handlerID,
 		Namespace: namespace,

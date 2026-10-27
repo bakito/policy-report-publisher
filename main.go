@@ -43,9 +43,8 @@ func main() {
 		slog.ErrorContext(ctx, "could not check if PolicyReport is available", "error", err)
 		os.Exit(1)
 	}
-	// https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/25056e1f3eb5cab1e693b8c880eb693a84e099af/policy-report/crd/v1beta2/wgpolicyk8s.io_policyreports.yaml
 	if !ok {
-		slog.ErrorContext(ctx, "PolicyReport CRD is not available, please install kyverno",
+		slog.ErrorContext(ctx, "Report CRD is not available, please install openreports/reports-api",
 			"APIVersion", report.PolicyReport.APIVersion,
 			"Kind", report.PolicyReport.Kind,
 		)

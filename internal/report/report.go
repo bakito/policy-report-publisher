@@ -10,8 +10,7 @@ import (
 
 	"github.com/bakito/policy-report-publisher/internal/env"
 	"github.com/bakito/policy-report-publisher/version"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
-	clientset "github.com/kyverno/kyverno/pkg/clients/kube"
+	openreportsv1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -21,6 +20,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/discovery"
+	kubernetes "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/util/retry"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -33,10 +33,10 @@ const (
 	PropertyUpdated = "updated"
 )
 
-var PolicyReport = metav1.TypeMeta{Kind: "PolicyReport", APIVersion: prv1alpha2.GroupVersion.String()}
+var PolicyReport = metav1.TypeMeta{Kind: "Report", APIVersion: openreportsv1alpha1.GroupVersion.String()}
 
 // +kubebuilder:rbac:groups=,resources=pods,verbs=get;list;watch
-// +kubebuilder:rbac:groups=wgpolicyk8s.io,resources=policyreports,verbs=get;list;watch;create;update;patch
+// +kubebuilder:rbac:groups=openreports.io,resources=reports,verbs=get;list;watch;create;update;patch
 
 func NewHandler() (Handler, error) {
 	kc, dcl, cs, err := initKubeClient()
@@ -64,9 +64,9 @@ func NewHandler() (Handler, error) {
 	}, nil
 }
 
-func initKubeClient() (client.Client, *discovery.DiscoveryClient, clientset.Interface, error) {
+func initKubeClient() (client.Client, *discovery.DiscoveryClient, kubernetes.Interface, error) {
 	scheme := runtime.NewScheme()
-	utilruntime.Must(prv1alpha2.Install(scheme))
+	utilruntime.Must(openreportsv1alpha1.Install(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
 
 	restClientGetter := genericclioptions.ConfigFlags{}
@@ -82,7 +82,7 @@ func initKubeClient() (client.Client, *discovery.DiscoveryClient, clientset.Inte
 		return nil, nil, nil, err
 	}
 
-	cs, err := clientset.NewForConfig(config)
+	cs, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -141,17 +141,23 @@ func (h *handler) Update(ctx context.Context, report *Item) error {
 	})
 }
 
-func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1.Pod) (*prv1alpha2.PolicyReport, error) {
+func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1.Pod) (*openreportsv1alpha1.Report, error) {
 	podID := string(pod.GetUID())
 	policyID := fmt.Sprintf("prp-%s", podID)
 
-	pol := &prv1alpha2.PolicyReport{}
+	pol := &openreportsv1alpha1.Report{}
 	err := h.client.Get(ctx, types.NamespacedName{Namespace: report.Namespace, Name: policyID}, pol)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			pol = &prv1alpha2.PolicyReport{
-				Namespace: report.Namespace,
-				Name:      policyID,
+			pol = &openreportsv1alpha1.Report{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Report",
+					APIVersion: openreportsv1alpha1.GroupVersion.String(),
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: report.Namespace,
+					Name:      policyID,
+				},
 			}
 
 			_ = controllerutil.SetOwnerReference(pod, pol, h.client.Scheme())
@@ -170,7 +176,7 @@ func (h *handler) getPolicyReport(ctx context.Context, report *Item, pod *corev1
 	return pol, nil
 }
 
-func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResult) {
+func addResult(pol *openreportsv1alpha1.Report, result openreportsv1alpha1.ReportResult) {
 	found := false
 
 	for i, res := range pol.Results {
@@ -187,7 +193,7 @@ func addResult(pol *prv1alpha2.PolicyReport, result prv1alpha2.PolicyReportResul
 	pol.Summary.Fail++
 }
 
-func mergeProperties(oldReport prv1alpha2.PolicyReportResult, newReport prv1alpha2.PolicyReportResult) map[string]string {
+func mergeProperties(oldReport openreportsv1alpha1.ReportResult, newReport openreportsv1alpha1.ReportResult) map[string]string {
 	oldProps := oldReport.Properties
 	cnt, err := strconv.Atoi(oldProps[propCount])
 	if err != nil {
