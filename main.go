@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/bakito/policy-report-publisher/internal/adapter/hubble"
-	"github.com/bakito/policy-report-publisher/internal/adapter/kubearmor"
 	"github.com/bakito/policy-report-publisher/internal/env"
 	"github.com/bakito/policy-report-publisher/internal/metrics"
 	"github.com/bakito/policy-report-publisher/internal/report"
@@ -23,16 +22,13 @@ func main() {
 	slog.SetDefault(logger)
 	klog.SetSlogLogger(logger)
 
-	if env.Empty(env.HubbleServiceName) && env.Empty(env.KubeArmorServiceName) {
-		slog.ErrorContext(ctx, "either 'Hubble' or 'KubeArmor' must be enabled",
-			"hubble", env.HubbleServiceName,
-			"kubearmor", env.KubeArmorServiceName)
+	if env.Empty(env.HubbleServiceName) {
+		slog.ErrorContext(ctx, "'Hubble' must be enabled", "hubble", env.HubbleServiceName)
 		os.Exit(1)
 	}
 
 	slog.InfoContext(ctx, "policy-report-publisher", "version", version.Version,
 		"hubble", os.Getenv(env.HubbleServiceName),
-		"kubearmor", os.Getenv(env.KubeArmorServiceName),
 		"log-reports", env.Active(env.LogReports))
 
 	// Initialize the report handler
@@ -85,7 +81,6 @@ func run(ctx context.Context, handler report.Handler, cancel context.CancelFunc)
 		cancel()
 	}()
 
-	start(ctx, reportChan, cancel, "KubeArmor", env.KubeArmorServiceName, kubearmor.Run)
 	start(ctx, reportChan, cancel, "Hubble", env.HubbleServiceName, hubble.Run)
 
 	// Process reports from the channel
