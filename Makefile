@@ -11,6 +11,9 @@ lint: tb.golangci-lint
 tidy:
 	go mod tidy
 
+test:
+	go test -v ./...
+
 all: tidy rbac lint
 
 pf-hubble:

@@ -7,7 +7,7 @@ import (
 
 	"github.com/bakito/policy-report-publisher/internal/report"
 	"github.com/cilium/cilium/api/v1/flow"
-	prv1alpha2 "github.com/kyverno/kyverno/api/policyreport/v1alpha2"
+	openreportsv1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,20 +26,20 @@ func toItem(f *flow.Flow) *report.Item {
 		return nil
 	}
 
-	pr := prv1alpha2.PolicyReportResult{
-		Category: f.TrafficDirection.String(),
-		Message:  f.DropReasonDesc.String(),
+	pr := openreportsv1alpha1.ReportResult{
+		Category:    f.TrafficDirection.String(),
+		Description: f.DropReasonDesc.String(),
 
-		Severity: "high",
+		Severity: openreportsv1alpha1.ResultSeverity("high"),
 		Policy:   "Egress Network Policy",
 		Rule:     dest,
-		// PolicyResult has one of the following values:
-		//   - pass: indicates that the policy requirements are met
-		//   - fail: indicates that the policy requirements are not met
-		//   - warn: indicates that the policy requirements and not met, and the policy is not scored
-		//   - error: indicates that the policy could not be evaluated
-		//   - skip: indicates that the policy was not selected based on user inputs or applicability
-		Result: "fail",
+		// Result has one of the following values:
+		//   - pass: the policy requirements are met
+		//   - fail: the policy requirements are not met
+		//   - warn: the policy requirements are not met and the policy is not scored
+		//   - error: the policy could not be evaluated
+		//   - skip: the policy was not selected based on user inputs or applicability
+		Result: openreportsv1alpha1.Result("fail"),
 		Scored: true,
 		Source: reportSource,
 		Timestamp: metav1.Timestamp{
@@ -57,7 +57,7 @@ func toItem(f *flow.Flow) *report.Item {
 	return report.ItemFor("clilum-blocked-egress", f.Source.Namespace, f.Source.PodName, pr, f)
 }
 
-func addPodLabels(f *flow.Flow, pr prv1alpha2.PolicyReportResult) {
+func addPodLabels(f *flow.Flow, pr openreportsv1alpha1.ReportResult) {
 	for _, podLabel := range f.Source.Labels {
 		for l := range consideredLabels {
 			if strings.HasPrefix(podLabel, "k8s:"+l+"=") {

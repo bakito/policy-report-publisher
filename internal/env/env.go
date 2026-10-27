@@ -11,8 +11,6 @@ const (
 
 	HubbleServiceName = "HUBBLE_SERVICE"
 	HubbleInsecure    = "HUBBLE_INSECURE"
-
-	KubeArmorServiceName = "KUBE_ARMOR_SERVICE"
 )
 
 func Active(env string) bool {
