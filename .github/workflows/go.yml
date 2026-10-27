@@ -30,5 +30,8 @@ jobs:
       run: make rbac
 
     - name: Build
+      run: make test
+
+    - name: Build
       run: go build -v ./...
 
